@@ -39,6 +39,13 @@ export interface PlayerAdvanceMessage {
   type: "player_advance";
 }
 
+/** Leader-only — abandons the current game and returns the room to LOBBY so
+ * everyone lands back on the "add players" screen. Players/traits/leader are kept
+ * (no need to rejoin or redraw a character), only scores and round history reset. */
+export interface PlayerResetGameMessage {
+  type: "player_reset_game";
+}
+
 export interface SubmitVoteMessage {
   type: "submit_vote";
   roundId: string;
@@ -56,6 +63,7 @@ export type PlayerClientMessage =
   | SubmitVoteMessage
   | PlayerStartGameMessage
   | PlayerAdvanceMessage
+  | PlayerResetGameMessage
   | LeaveRoomMessage;
 
 /** Sent only over a host connection. */

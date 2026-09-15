@@ -31,7 +31,11 @@ export function LeaderboardScreen({
   const nextRoundInSec = nextRoundAtTs ? Math.max(0, Math.ceil((nextRoundAtTs - now) / 1000)) : undefined;
   const byId = useMemo(() => new Map(players.map((p) => [p.id, p])), [players]);
 
-  const [first, second, third, ...rest] = standings;
+  // Podium only covers however many players actually exist (1 or 2 players still
+  // show their podium block instead of the whole screen going blank) — anyone
+  // beyond the top 3 goes in the rank list below.
+  const [first, second, third] = standings;
+  const rest = standings.slice(3);
 
   return (
     <Dancefloor bg="radial-gradient(120% 95% at 42% 105%,#3B2749 0%,#1C1526 58%,#14101C 100%)">
@@ -48,9 +52,9 @@ export function LeaderboardScreen({
         </div>
       </div>
 
-      {first && second && third && (
+      {(first || second || third) && (
         <div style={{ position: "absolute", left: 56, bottom: 56, display: "flex", alignItems: "flex-end", gap: 16 }}>
-          {byId.get(second.playerId)?.traits && (
+          {second && byId.get(second.playerId)?.traits && (
             <PodiumBlock
               dancer={<Dancer traits={byId.get(second.playerId)!.traits!} label={second.name} reaction="laugh" scale={0.82} />}
               rank={2}
@@ -64,7 +68,7 @@ export function LeaderboardScreen({
               ptsColor="#FFF3E8"
             />
           )}
-          {byId.get(first.playerId)?.traits && (
+          {first && byId.get(first.playerId)?.traits && (
             <PodiumBlock
               dancer={<Dancer traits={byId.get(first.playerId)!.traits!} label={first.name} reaction="win" scale={0.98} />}
               rank={1}
@@ -79,7 +83,7 @@ export function LeaderboardScreen({
               glow
             />
           )}
-          {byId.get(third.playerId)?.traits && (
+          {third && byId.get(third.playerId)?.traits && (
             <PodiumBlock
               dancer={<Dancer traits={byId.get(third.playerId)!.traits!} label={third.name} reaction="sad" scale={0.78} />}
               rank={3}

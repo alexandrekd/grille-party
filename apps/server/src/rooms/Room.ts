@@ -272,6 +272,18 @@ export class Room {
     return this.startNextRound(now);
   }
 
+  /** Leader-only "réinitialiser la partie" — abandons the game from any phase and
+   * returns to LOBBY. Players keep their connection, traits and READY status (no
+   * need to rejoin or redraw a character) and the leader stays the leader; only
+   * scores and round/track-pool history reset, same as a fresh `startGame`. */
+  resetGame(now: number): void {
+    this.rounds.length = 0;
+    this.currentRoundIndex = -1;
+    this.trackPool = null;
+    for (const p of this.players.values()) p.score = 0;
+    this.transitionTo("LOBBY", now);
+  }
+
   get isFinalStanding(): boolean {
     return this.phase === "GAME_OVER";
   }

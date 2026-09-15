@@ -36,6 +36,7 @@ export interface MobileActions {
    * these from anyone else. */
   startGame: (maxRounds?: number) => void;
   advance: () => void;
+  resetGame: () => void;
 }
 
 /**
@@ -156,6 +157,10 @@ export function useMobileSocket(): MobileView & { actions: MobileActions } {
     wsRef.current?.send(encodeMessage({ type: "player_advance" }));
   }, []);
 
+  const resetGame = useCallback(() => {
+    wsRef.current?.send(encodeMessage({ type: "player_reset_game" }));
+  }, []);
+
   return {
     roomState,
     voteProgress,
@@ -164,6 +169,6 @@ export function useMobileSocket(): MobileView & { actions: MobileActions } {
     myPlayerId,
     myVote,
     joinError,
-    actions: { join, submitTraits, submitVote, startGame, advance },
+    actions: { join, submitTraits, submitVote, startGame, advance, resetGame },
   };
 }

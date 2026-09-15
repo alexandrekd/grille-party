@@ -120,4 +120,60 @@ describe("WS server integration", () => {
     p1.close();
     p2.close();
   });
+
+  it("reaches GAME_OVER with a final leaderboard after the leader advances through REVEAL and LEADERBOARD", async () => {
+    const host = await connect(port, "/ws/host");
+    host.send({ type: "host_join" });
+    const registered = await host.waitFor((m) => m.type === "host_registered");
+    const roomCode = registered["roomCode"] as string;
+
+    const p1 = await connect(port, "/ws/player");
+    p1.send({ type: "join_room", roomCode, playerName: "Ava" });
+    const joined1 = await p1.waitFor((m) => m.type === "joined");
+    const p1Id = joined1["playerId"] as string;
+
+    const p2 = await connect(port, "/ws/player");
+    p2.send({ type: "join_room", roomCode, playerName: "Noé" });
+    const joined2 = await p2.waitFor((m) => m.type === "joined");
+    const p2Id = joined2["playerId"] as string;
+
+    p1.send({ type: "submit_traits", traits: DEFAULT_TRAITS, name: "Ava" });
+    p2.send({ type: "submit_traits", traits: DEFAULT_TRAITS, name: "Noé" });
+    await p1.waitFor((m) => m.type === "room_state" && (m as { allReady?: boolean }).allReady === true);
+
+    // p1 joined first, so p1 is the room's leader — a single-round game so
+    // LEADERBOARD's next advance has nowhere to go but GAME_OVER.
+    p1.send({ type: "player_start_game", maxRounds: 1 });
+    const voting = await host.waitFor((m) => m.type === "room_state" && (m as { phase?: string }).phase === "VOTING");
+    const round = (voting as { round: { roundId: string } }).round;
+
+    p1.send({ type: "submit_vote", roundId: round.roundId, votedForPlayerId: p2Id });
+    p2.send({ type: "submit_vote", roundId: round.roundId, votedForPlayerId: p2Id });
+    await host.waitFor((m) => m.type === "round_resolved");
+
+    p1.send({ type: "player_advance" }); // REVEAL -> LEADERBOARD
+    await host.waitFor((m) => m.type === "room_state" && (m as { phase?: string }).phase === "LEADERBOARD");
+    const nonFinal = await host.waitFor(
+      (m) => m.type === "leaderboard" && (m as { isFinal?: boolean }).isFinal === false,
+    );
+    expect(nonFinal).toHaveProperty("standings");
+
+    p1.send({ type: "player_advance" }); // LEADERBOARD -> GAME_OVER
+    await host.waitFor((m) => m.type === "room_state" && (m as { phase?: string }).phase === "GAME_OVER");
+    const final = await host.waitFor(
+      (m) => m.type === "leaderboard" && (m as { isFinal?: boolean }).isFinal === true,
+    );
+    const standings = final["standings"] as { playerId: string; score: number }[];
+    expect(standings.map((s) => s.playerId).sort()).toEqual([p1Id, p2Id].sort());
+
+    // The mobile leaderboard gets the same final message, not just the host.
+    const finalP1 = await p1.waitFor(
+      (m) => m.type === "leaderboard" && (m as { isFinal?: boolean }).isFinal === true,
+    );
+    expect(finalP1).toHaveProperty("standings");
+
+    host.close();
+    p1.close();
+    p2.close();
+  });
 });

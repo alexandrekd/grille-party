@@ -121,6 +121,29 @@ describe("Room round loop — happy path", () => {
     expect(room2.currentRound!.totalVoteMs).toBe(15_000);
   });
 
+  it("resetGame returns to LOBBY, zeroes scores, and keeps players/leader/traits", () => {
+    const { room, players } = readyRoom(2);
+    room.startGame(8, 0);
+    const round = room.currentRound!;
+    for (const p of players) room.submitVote(p.id, round.id, round.ownerPlayerId, 10);
+    expect(room.phase).toBe("REVEAL");
+    expect(players.some((p) => p.score !== 0)).toBe(true);
+    const leaderBefore = room.leaderPlayerId;
+
+    room.resetGame(20);
+
+    expect(room.phase).toBe("LOBBY");
+    expect(room.currentRound).toBeNull();
+    expect(room.leaderPlayerId).toBe(leaderBefore);
+    for (const p of players) {
+      expect(room.players.get(p.id)?.score).toBe(0);
+      expect(room.players.get(p.id)?.status).toBe("READY");
+      expect(room.players.get(p.id)?.traits).not.toBeNull();
+    }
+    // A fresh game can start right away.
+    expect(room.startGame(8, 30)).toBe(true);
+  });
+
   it("does not resolve a round until every player has voted", () => {
     const { room, players } = readyRoom(3);
     room.startGame(8, 0);

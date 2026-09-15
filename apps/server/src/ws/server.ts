@@ -196,6 +196,19 @@ function handleMessage(
       return;
     }
 
+    case "player_reset_game": {
+      const room = roomForMeta(roomManager, meta);
+      if (!room || meta.role !== "player") return;
+      if (meta.playerId !== room.leaderPlayerId) {
+        sendError(raw, "not_leader", "Seul le joueur principal peut réinitialiser la partie.");
+        return;
+      }
+      room.resetGame(Date.now());
+      sendStopTrackToHost(registry, room);
+      broadcastRoomState(registry, room);
+      return;
+    }
+
     case "submit_vote": {
       const room = roomForMeta(roomManager, meta);
       if (!room || meta.role !== "player" || !meta.playerId) return;

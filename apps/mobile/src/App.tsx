@@ -120,6 +120,15 @@ export function App() {
       {me?.isLeader && (roomState?.phase === "REVEAL" || roomState?.phase === "LEADERBOARD") && (
         <SkipButton onClick={actions.advance} />
       )}
+      {me?.isLeader && roomState?.phase && roomState.phase !== "LOBBY" && (
+        <ResetButton
+          onClick={() => {
+            if (window.confirm("Réinitialiser la partie ? Tout le monde reviendra sur l'écran d'ajout des joueurs.")) {
+              actions.resetGame();
+            }
+          }}
+        />
+      )}
     </>
   );
 
@@ -238,6 +247,30 @@ function SkipButton({ onClick }: { onClick: () => void }) {
       }}
     >
       Passer →
+    </button>
+  );
+}
+
+/** Leader-only abort — jumps straight back to LOBBY from any phase (asks for
+ * confirmation first since it discards the current game's scores/progress). */
+function ResetButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        position: "fixed",
+        left: 16,
+        bottom: 16,
+        font: "700 14px 'Nunito',sans-serif",
+        padding: "10px 18px",
+        borderRadius: 999,
+        border: "2px solid #FF6B5A",
+        cursor: "pointer",
+        background: "rgba(29,20,38,.9)",
+        color: "#FF6B5A",
+      }}
+    >
+      ↺ Réinitialiser
     </button>
   );
 }
