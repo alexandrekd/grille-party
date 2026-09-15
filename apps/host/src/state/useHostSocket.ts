@@ -12,6 +12,7 @@ import { serverWsBase } from "../lib/wsUrl.js";
 import type { HostActions, HostView, SpotifyCommand } from "./types.js";
 
 const RECONNECT_DELAY_MS = 1500;
+const ROOM_CODE_STORAGE_KEY = "grille:hostRoomCode";
 
 /** Real counterpart to `useMockHostState()` — identical `HostView`/`HostActions`
  * shape, so `App.tsx` doesn't change when this replaces the mock. Registers as the
@@ -35,13 +36,17 @@ export function useHostSocket(): HostView & { actions: HostActions } {
       wsRef.current = socket;
 
       socket.addEventListener("open", () => {
-        socket.send(encodeMessage({ type: "host_join" }));
+        const storedRoomCode = sessionStorage.getItem(ROOM_CODE_STORAGE_KEY) ?? undefined;
+        socket.send(encodeMessage({ type: "host_join", roomCode: storedRoomCode }));
       });
 
       socket.addEventListener("message", (ev) => {
         const msg = decodeMessage<HostBoundMessage>(String(ev.data));
         if (!msg) return;
         switch (msg.type) {
+          case "host_registered":
+            sessionStorage.setItem(ROOM_CODE_STORAGE_KEY, msg.roomCode);
+            break;
           case "room_state":
             setRoomState(msg);
             break;
@@ -64,6 +69,13 @@ export function useHostSocket(): HostView & { actions: HostActions } {
             break;
           case "error":
             console.error("[host] server error:", msg.code, msg.message);
+            if (msg.code === "room_not_found") {
+              // Stored room no longer exists server-side (e.g. server restarted) —
+              // drop it and immediately retry on this same socket so we don't get
+              // stuck unregistered until something else closes the connection.
+              sessionStorage.removeItem(ROOM_CODE_STORAGE_KEY);
+              socket.send(encodeMessage({ type: "host_join" }));
+            }
             break;
           default:
             break;
