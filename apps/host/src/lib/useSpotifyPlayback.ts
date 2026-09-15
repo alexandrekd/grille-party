@@ -6,14 +6,10 @@ const SDK_SRC = "https://sdk.scdn.co/spotify-player.js";
 const SPOTIFY_API = "https://api.spotify.com/v1";
 
 function loadSdkScript(): void {
-  if (document.querySelector(`script[src="${SDK_SRC}"]`)) {
-    console.log("[spotify] sdk script tag already present");
-    return;
-  }
+  if (document.querySelector(`script[src="${SDK_SRC}"]`)) return;
   const s = document.createElement("script");
   s.src = SDK_SRC;
   s.async = true;
-  s.addEventListener("load", () => console.log("[spotify] sdk script loaded"));
   s.addEventListener("error", (e) => console.error("[spotify] sdk script failed to load", e));
   document.head.appendChild(s);
 }
@@ -21,7 +17,6 @@ function loadSdkScript(): void {
 async function fetchHostAccessToken(roomCode: string): Promise<string | null> {
   try {
     const res = await fetch(`${serverHttpBase()}/spotify/host/token?roomCode=${encodeURIComponent(roomCode)}`);
-    console.log("[spotify] host/token fetch status", res.status);
     if (!res.ok) return null;
     const json = (await res.json()) as { accessToken?: string };
     return json.accessToken ?? null;
@@ -41,59 +36,57 @@ async function fetchHostAccessToken(roomCode: string): Promise<string | null> {
  */
 export function useSpotifyPlayback(roomCode: string | null, command: SpotifyCommand | null): { connected: boolean } {
   const [connected, setConnected] = useState(false);
+  const [sdkReady, setSdkReady] = useState(false);
   const deviceIdRef = useRef<string | null>(null);
   const roomCodeRef = useRef(roomCode);
   roomCodeRef.current = roomCode;
+  const playerRef = useRef<SpotifyPlayerInstance | null>(null);
 
+  // Load the SDK script once; just flips sdkReady once window.Spotify exists.
   useEffect(() => {
     loadSdkScript();
-    let player: SpotifyPlayerInstance | null = null;
-
-    function init() {
-      console.log("[spotify] init() called, window.Spotify present:", !!window.Spotify);
-      if (!window.Spotify) return;
-      player = new window.Spotify.Player({
-        name: "Grillé ! — TV",
-        volume: 0.8,
-        getOAuthToken: (cb) => {
-          const rc = roomCodeRef.current;
-          console.log("[spotify] getOAuthToken called, roomCode:", rc);
-          if (!rc) {
-            console.warn("[spotify] getOAuthToken called before roomCode was known — cannot fetch a token");
-            return;
-          }
-          void fetchHostAccessToken(rc).then((token) => {
-            console.log("[spotify] fetchHostAccessToken resolved, got token:", !!token);
-            if (token) cb(token);
-          });
-        },
-      });
-      player.addListener("ready", ({ device_id }) => {
-        console.log("[spotify] ready, device_id:", device_id);
-        deviceIdRef.current = device_id;
-        setConnected(true);
-      });
-      player.addListener("not_ready", () => {
-        console.warn("[spotify] not_ready");
-        setConnected(false);
-      });
-      player.addListener("initialization_error", (d) => console.error("[spotify] init error", d.message));
-      player.addListener("authentication_error", (d) => console.error("[spotify] auth error", d.message));
-      player.addListener("account_error", (d) =>
-        console.error("[spotify] account error (Premium required)", d.message),
-      );
-      player.addListener("playback_error", (d) => console.error("[spotify] playback error", d.message));
-      player
-        .connect()
-        .then((ok) => console.log("[spotify] connect() resolved:", ok))
-        .catch((e: unknown) => console.error("[spotify] connect() threw", e));
-    }
-
-    if (window.Spotify) init();
-    else window.onSpotifyWebPlaybackSDKReady = init;
-
-    return () => player?.disconnect();
+    if (window.Spotify) setSdkReady(true);
+    else window.onSpotifyWebPlaybackSDKReady = () => setSdkReady(true);
   }, []);
+
+  // Create and connect the player only once we *also* know the room code.
+  // The SDK calls getOAuthToken a single time as part of connect() and never
+  // retries — connecting before roomCode was known meant that first (only)
+  // call got nothing back and the whole connection stalled forever, silently.
+  useEffect(() => {
+    if (!sdkReady || !roomCode || playerRef.current || !window.Spotify) return;
+
+    const player = new window.Spotify.Player({
+      name: "Grillé ! — TV",
+      volume: 0.8,
+      getOAuthToken: (cb) => {
+        const rc = roomCodeRef.current;
+        if (!rc) return;
+        void fetchHostAccessToken(rc).then((token) => {
+          if (token) cb(token);
+        });
+      },
+    });
+    playerRef.current = player;
+
+    player.addListener("ready", ({ device_id }) => {
+      deviceIdRef.current = device_id;
+      setConnected(true);
+    });
+    player.addListener("not_ready", () => setConnected(false));
+    player.addListener("initialization_error", (d) => console.error("[spotify] init error", d.message));
+    player.addListener("authentication_error", (d) => console.error("[spotify] auth error", d.message));
+    player.addListener("account_error", (d) =>
+      console.error("[spotify] account error (Premium required)", d.message),
+    );
+    player.addListener("playback_error", (d) => console.error("[spotify] playback error", d.message));
+    void player.connect();
+
+    return () => {
+      player.disconnect();
+      playerRef.current = null;
+    };
+  }, [sdkReady, roomCode]);
 
   useEffect(() => {
     if (!command || !connected) return;
