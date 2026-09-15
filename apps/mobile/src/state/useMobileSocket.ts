@@ -10,9 +10,15 @@ import {
   type VoteProgressMessage,
 } from "@grille/shared";
 import { serverWsBase } from "../lib/wsUrl.js";
+import { serverHttpBase } from "../lib/serverHttpBase.js";
 import { loadStoredRejoin, saveStoredRejoin } from "./rejoinStorage.js";
 
 const RECONNECT_DELAY_MS = 1500;
+// Plain HTTP backstop polled alongside the WebSocket — see the server's
+// /room/sync doc comment. A short request can't go silently stale the way a
+// long-lived connection can, so this bounds how far behind this player can ever
+// get regardless of the WebSocket's health.
+const POLL_INTERVAL_MS = 2000;
 
 export interface MobileView {
   roomState: RoomStateMessage | null;
@@ -164,6 +170,43 @@ export function useMobileSocket(): MobileView & { actions: MobileActions } {
       window.removeEventListener("pageshow", resync);
     };
   }, [ensureSocket]);
+
+  useEffect(() => {
+    const roomCode = roomState?.roomCode;
+    if (!myPlayerId || !roomCode) return;
+    let cancelled = false;
+
+    async function poll() {
+      try {
+        const res = await fetch(
+          `${serverHttpBase()}/room/sync?roomCode=${encodeURIComponent(roomCode!)}&playerId=${encodeURIComponent(myPlayerId!)}`,
+        );
+        if (!res.ok || cancelled) return;
+        const data = (await res.json()) as {
+          roomState: RoomStateMessage;
+          voteProgress: VoteProgressMessage | null;
+          roundResolved: RoundResolvedMessage | null;
+          leaderboard: LeaderboardMessage | null;
+          myVote: string | null;
+        };
+        if (cancelled) return;
+        setRoomState(data.roomState);
+        if (data.voteProgress) setVoteProgress(data.voteProgress);
+        setRoundResolved(data.roundResolved);
+        setLeaderboard(data.leaderboard);
+        setMyVote(data.myVote);
+      } catch {
+        // Ignore — this is a backstop on top of the WebSocket, not the only path;
+        // the next tick just tries again.
+      }
+    }
+
+    const id = setInterval(poll, POLL_INTERVAL_MS);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
+  }, [myPlayerId, roomState?.roomCode]);
 
   const join = useCallback(
     (roomCode: string, playerName?: string) => {

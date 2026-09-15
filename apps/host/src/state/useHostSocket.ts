@@ -9,10 +9,16 @@ import {
   type VoteProgressMessage,
 } from "@grille/shared";
 import { serverWsBase } from "../lib/wsUrl.js";
+import { serverHttpBase } from "../lib/serverHttpBase.js";
 import type { HostActions, HostView, SpotifyCommand } from "./types.js";
 
 const RECONNECT_DELAY_MS = 1500;
 const ROOM_CODE_STORAGE_KEY = "grille:hostRoomCode";
+// Plain HTTP backstop polled alongside the WebSocket — see the server's
+// /room/sync doc comment. Deliberately doesn't touch spotifyCommand: polling
+// must never re-trigger play_track/stop_track, or every tick would restart
+// the song. It only keeps the display (phase, reveal, leaderboard) in sync.
+const POLL_INTERVAL_MS = 2000;
 
 /** Real counterpart to `useMockHostState()` — identical `HostView`/`HostActions`
  * shape, so `App.tsx` doesn't change when this replaces the mock. Registers as the
@@ -134,6 +140,39 @@ export function useHostSocket(): HostView & { actions: HostActions } {
       window.removeEventListener("pageshow", resync);
     };
   }, []);
+
+  useEffect(() => {
+    const roomCode = roomState?.roomCode;
+    if (!roomCode) return;
+    let cancelled = false;
+
+    async function poll() {
+      try {
+        const res = await fetch(`${serverHttpBase()}/room/sync?roomCode=${encodeURIComponent(roomCode!)}`);
+        if (!res.ok || cancelled) return;
+        const data = (await res.json()) as {
+          roomState: RoomStateMessage;
+          voteProgress: VoteProgressMessage | null;
+          roundResolved: RoundResolvedMessage | null;
+          leaderboard: LeaderboardMessage | null;
+        };
+        if (cancelled) return;
+        setRoomState(data.roomState);
+        if (data.voteProgress) setVoteProgress(data.voteProgress);
+        setRoundResolved(data.roundResolved);
+        setLeaderboard(data.leaderboard);
+      } catch {
+        // Ignore — this is a backstop on top of the WebSocket, not the only path;
+        // the next tick just tries again.
+      }
+    }
+
+    const id = setInterval(poll, POLL_INTERVAL_MS);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
+  }, [roomState?.roomCode]);
 
   const startGame = useCallback((maxRounds?: number) => {
     wsRef.current?.send(encodeMessage({ type: "host_start_game", maxRounds }));

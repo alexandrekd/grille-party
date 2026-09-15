@@ -8,6 +8,7 @@ import {
   type SpotifyConfig,
 } from "../integrations/spotify/oauth.js";
 import { createPendingAuth, takePendingAuth } from "../integrations/spotify/pendingAuth.js";
+import { leaderboardMessage, roomStateMessage, roundResolvedMessage } from "../ws/broadcast.js";
 
 export interface HttpDeps {
   roomManager: RoomManager;
@@ -36,6 +37,11 @@ export function createHttpHandler(deps: HttpDeps) {
 
     if (url.pathname === "/health") {
       sendJson(res, 200, { ok: true, rooms: deps.roomManager.size, spotify: !!deps.spotify });
+      return;
+    }
+
+    if (url.pathname === "/room/sync") {
+      handleRoomSync(url, res, deps);
       return;
     }
 
@@ -79,6 +85,36 @@ export function createHttpHandler(deps: HttpDeps) {
       }
     }
   };
+}
+
+/**
+ * Plain HTTP backstop the clients poll every couple seconds alongside their
+ * WebSocket, so a phase change is never missed for longer than the poll interval
+ * even if the WebSocket has gone silently stale (a free-tier proxy dropping an
+ * idle connection without either side seeing a close event — see the WS
+ * heartbeat's doc comment in ws/server.ts). A short-lived HTTP request can't go
+ * stale the same way, so this is a reliable ceiling on how out of sync a client
+ * can ever get, independent of whatever is wrong with the socket.
+ */
+function handleRoomSync(url: URL, res: ServerResponse, deps: HttpDeps): void {
+  const roomCode = url.searchParams.get("roomCode");
+  const room = roomCode ? deps.roomManager.get(roomCode) : null;
+  if (!room) {
+    sendJson(res, 404, { error: "room_not_found" });
+    return;
+  }
+  const playerId = url.searchParams.get("playerId");
+  const vp = room.voteProgress;
+  sendJson(res, 200, {
+    roomState: roomStateMessage(room),
+    voteProgress: vp ? { type: "vote_progress", ...vp } : null,
+    roundResolved: roundResolvedMessage(room),
+    leaderboard:
+      room.phase === "LEADERBOARD" || room.phase === "GAME_OVER"
+        ? leaderboardMessage(room, room.phase === "GAME_OVER")
+        : null,
+    myVote: playerId ? (room.currentRound?.votes.get(playerId) ?? null) : null,
+  });
 }
 
 function handlePlayerLogin(url: URL, res: ServerResponse, deps: HttpDeps, spotify: SpotifyConfig): void {
