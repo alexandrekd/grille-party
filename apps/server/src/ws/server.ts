@@ -33,16 +33,28 @@ function playCurrentRound(registry: ConnectionRegistry, room: Room): void {
 }
 
 const SCHEDULER_TICK_MS = 500;
+// Many free-tier hosts/proxies (Render included) silently drop a WebSocket that's
+// gone quiet for a minute or two, without either side ever seeing a close event —
+// the connection just stops delivering frames. Rounds can now run for minutes with
+// no traffic on their own (a song's length, not a fixed 20s), so this isn't rare.
+// A ping every 25s keeps bytes flowing (resets the proxy's idle timer) and lets us
+// detect and terminate a truly-dead connection quickly instead of leaving a player
+// stuck on a stale screen indefinitely.
+const HEARTBEAT_INTERVAL_MS = 25_000;
 
 export function startWsServer(httpServer: HttpServer, roomManager: RoomManager): WebSocketServer {
   const wss = new WebSocketServer({ server: httpServer });
   const registry = new ConnectionRegistry();
+  const alive = new WeakSet<WebSocket>();
 
   wss.on("connection", (raw, req) => {
     const connectionId = newId();
     const url = new URL(req.url ?? "/", "http://internal");
     const role = url.pathname === "/ws/host" ? "host" : "player";
     registry.add(connectionId, raw, { role, roomCode: null, playerId: null });
+    alive.add(raw);
+
+    raw.on("pong", () => alive.add(raw));
 
     raw.on("message", (data) => {
       const parsed = decodeMessage<ClientMessage>(String(data));
@@ -55,8 +67,22 @@ export function startWsServer(httpServer: HttpServer, roomManager: RoomManager):
     });
   });
 
-  const timer = setInterval(() => tickAll(registry, roomManager), SCHEDULER_TICK_MS);
-  wss.on("close", () => clearInterval(timer));
+  const heartbeatTimer = setInterval(() => {
+    for (const client of wss.clients) {
+      if (!alive.has(client)) {
+        client.terminate();
+        continue;
+      }
+      alive.delete(client);
+      client.ping();
+    }
+  }, HEARTBEAT_INTERVAL_MS);
+
+  const schedulerTimer = setInterval(() => tickAll(registry, roomManager), SCHEDULER_TICK_MS);
+  wss.on("close", () => {
+    clearInterval(schedulerTimer);
+    clearInterval(heartbeatTimer);
+  });
 
   return wss;
 }
