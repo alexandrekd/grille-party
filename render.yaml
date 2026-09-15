@@ -8,6 +8,20 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 22.0.0
+      - key: PUBLIC_SERVER_URL
+        value: https://grille-server.onrender.com
+      - key: PUBLIC_HOST_URL
+        value: https://grille-host.onrender.com
+      - key: PUBLIC_MOBILE_URL
+        value: https://grille-mobile.onrender.com
+      # Spotify Client ID is not secret (it's embedded in OAuth redirect URLs by
+      # design) so it's fine to commit. The secret is NOT here — Render prompts for
+      # it in the dashboard instead (sync: false) and never stores it in this file
+      # or in git.
+      - key: SPOTIFY_CLIENT_ID
+        value: 11bd90c1adcb4838ade3daaf9eefd13d
+      - key: SPOTIFY_CLIENT_SECRET
+        sync: false
 
   - type: web
     name: grille-host

@@ -113,6 +113,21 @@ export interface ErrorMessage {
   message: string;
 }
 
+/** Host-only: start real Spotify playback for the round now beginning. The host
+ * needs the track URI to hand to the Web Playback SDK even though it must never be
+ * displayed — this is the one place a track identity reaches the host pre-reveal,
+ * and it travels only as an opaque URI the host passes straight to Spotify's API,
+ * never rendered in the UI. */
+export interface PlayTrackMessage {
+  type: "play_track";
+  trackUri: string;
+}
+
+/** Host-only: stop/pause playback (round resolved, or no Spotify session active). */
+export interface StopTrackMessage {
+  type: "stop_track";
+}
+
 /** Broadcast/shared messages both audiences may receive. */
 export type SharedServerMessage =
   | RoomStateMessage
@@ -124,7 +139,11 @@ export type SharedServerMessage =
   | PlayerDisconnectedMessage
   | ErrorMessage;
 
-export type HostBoundMessage = SharedServerMessage | HostRegisteredMessage;
+export type HostBoundMessage =
+  | SharedServerMessage
+  | HostRegisteredMessage
+  | PlayTrackMessage
+  | StopTrackMessage;
 
 export type PlayerBoundMessage =
   | SharedServerMessage

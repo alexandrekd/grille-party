@@ -9,7 +9,7 @@ import {
   type VoteProgressMessage,
 } from "@grille/shared";
 import { serverWsBase } from "../lib/wsUrl.js";
-import type { HostActions, HostView } from "./types.js";
+import type { HostActions, HostView, SpotifyCommand } from "./types.js";
 
 const RECONNECT_DELAY_MS = 1500;
 
@@ -22,7 +22,9 @@ export function useHostSocket(): HostView & { actions: HostActions } {
   const [voteProgress, setVoteProgress] = useState<VoteProgressMessage | null>(null);
   const [roundResolved, setRoundResolved] = useState<RoundResolvedMessage | null>(null);
   const [leaderboard, setLeaderboard] = useState<LeaderboardMessage | null>(null);
+  const [spotifyCommand, setSpotifyCommand] = useState<SpotifyCommand | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
+  const seqRef = useRef(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -51,6 +53,14 @@ export function useHostSocket(): HostView & { actions: HostActions } {
             break;
           case "leaderboard":
             setLeaderboard(msg);
+            break;
+          case "play_track":
+            seqRef.current += 1;
+            setSpotifyCommand({ type: "play", trackUri: msg.trackUri, seq: seqRef.current });
+            break;
+          case "stop_track":
+            seqRef.current += 1;
+            setSpotifyCommand({ type: "stop", seq: seqRef.current });
             break;
           case "error":
             console.error("[host] server error:", msg.code, msg.message);
@@ -82,5 +92,12 @@ export function useHostSocket(): HostView & { actions: HostActions } {
     wsRef.current?.send(encodeMessage({ type: "host_advance" }));
   }, []);
 
-  return { roomState, voteProgress, roundResolved, leaderboard, actions: { startGame, advance } };
+  return {
+    roomState,
+    voteProgress,
+    roundResolved,
+    leaderboard,
+    spotifyCommand,
+    actions: { startGame, advance },
+  };
 }

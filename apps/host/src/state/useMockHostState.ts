@@ -71,7 +71,7 @@ export function useMockHostState(): HostView & {
         round: null,
         allReady: players.length === CHAR_FIXTURES.length,
       };
-      return { roomState, voteProgress: null, roundResolved: null, leaderboard: null };
+      return { roomState, voteProgress: null, roundResolved: null, leaderboard: null, spotifyCommand: null };
     }
 
     if (scene === "VOTING") {
@@ -90,7 +90,7 @@ export function useMockHostState(): HostView & {
         votesReceived: 6,
         votesExpected: 8,
       };
-      return { roomState, voteProgress, roundResolved: null, leaderboard: null };
+      return { roomState, voteProgress, roundResolved: null, leaderboard: null, spotifyCommand: null };
     }
 
     if (scene === "REVEAL") {
@@ -140,7 +140,7 @@ export function useMockHostState(): HostView & {
           { playerId: "basile", reaction: "sad" },
         ],
       };
-      return { roomState, voteProgress: null, roundResolved, leaderboard: null };
+      return { roomState, voteProgress: null, roundResolved, leaderboard: null, spotifyCommand: null };
     }
 
     const isFinal = scene === "GAME_OVER";
@@ -161,7 +161,7 @@ export function useMockHostState(): HostView & {
       isFinal,
       nextRoundInSec: isFinal ? undefined : 5,
     };
-    return { roomState, voteProgress: null, roundResolved: null, leaderboard };
+    return { roomState, voteProgress: null, roundResolved: null, leaderboard, spotifyCommand: null };
   }, [scene, deadline]);
 
   return { ...view, actions: { startGame, advance }, devScene: scene, devSetScene: setScene };

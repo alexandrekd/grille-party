@@ -2,7 +2,7 @@
 
 A party game for a living room: one big screen (the "host") shows a shared dancefloor while players join from their phones, build a 2D character, and vote each round on whose mystery song is playing — including the song's own owner, who's bluffing along with everyone else.
 
-This repo is a full-stack MVP: real React frontends, a real Node/WebSocket backend, and a real scoring engine. Spotify is **stubbed** (fixture "top tracks" per player, no real OAuth or audio playback yet) — see [`apps/server/src/integrations/spotify`](apps/server/src/integrations/spotify) for the seam where real Spotify integration plugs in later.
+This repo is a full-stack MVP: real React frontends, a real Node/WebSocket backend, a real scoring engine, and **real Spotify integration** (OAuth per player + the host's Web Playback SDK). If `SPOTIFY_CLIENT_ID`/`SPOTIFY_CLIENT_SECRET` aren't set, the server falls back to the fixture track pool in [`apps/server/src/integrations/spotify`](apps/server/src/integrations/spotify) and no audio plays — same as before, just silent.
 
 ## Layout
 
@@ -53,6 +53,23 @@ If `grille-server`'s auto-assigned URL isn't exactly `grille-server.onrender.com
 
 Render's free web services spin down after 15 minutes of inactivity and take ~30-60s to wake back up on the next request — fine for testing, not for an actual party.
 
+## Spotify setup (real playback)
+
+1. Create an app at the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+2. Add **two** redirect URIs in the app's Settings (must match the server's own domain — it does the token exchange, not the frontends):
+   - `https://grille-server.onrender.com/spotify/player/callback`
+   - `https://grille-server.onrender.com/spotify/host/callback`
+3. On Render, set on the `grille-server` service:
+   - `SPOTIFY_CLIENT_ID` — from the app's Settings (already in `render.yaml`, not secret)
+   - `SPOTIFY_CLIENT_SECRET` — from the app's Settings ("View client secret"). Set this **directly in the Render dashboard**, never commit it — `render.yaml` deliberately omits its value (`sync: false`) so Render prompts you for it instead
+4. Redeploy `grille-server`
+
+What each side needs:
+- **Players** just need a free Spotify account — "Continuer avec Spotify" on the character screen authorizes read-only access to their top tracks (`user-top-read`), no Premium required.
+- **The host (TV)** needs a **Premium** account — Spotify's Web Playback SDK refuses to stream on free accounts. Connect it from the "Connecter Spotify (Premium)" button in the Lobby screen before starting the game; if skipped, rounds just play silently, same as the pre-integration MVP.
+
+Track titles/artists are still never shown anywhere in the UI (by design, so nothing spoils who owns a song) — the host only ever receives an opaque track URI to hand to Spotify's playback API, never a human-readable title.
+
 ## Testing
 
 ```
@@ -64,7 +81,8 @@ The WS integration test (`apps/server/src/ws/server.integration.test.ts`) specif
 
 ## Design notes / known limitations (MVP)
 
-- **Spotify is stubbed.** Fixture tracks are partitioned across players on join; swapping in real OAuth + Web Playback SDK only touches `apps/server/src/integrations/spotify`.
+- **Spotify falls back to a stub** whenever `SPOTIFY_CLIENT_ID`/`SPOTIFY_CLIENT_SECRET` aren't set, or a player skips connecting, or the host skips Premium — fixture tracks fill in per-player so the game never breaks, just plays silently for whoever's missing a real connection.
+- **No token persistence.** Host/player Spotify tokens live in server memory only (per `Room`) — a server restart mid-game means reconnecting Spotify again.
 - **No host auth.** The last connection to claim a room code becomes its TV — fine for a trusted living-room game, not for anything public-facing.
 - **QR joining is visual-only** for now; the 4-digit code is the real join path.
 - **Character editor** exposes 4 trait rows (coiffure/peau/tenue/accessoire) — hair color and pants use fixed defaults, matching the original design.

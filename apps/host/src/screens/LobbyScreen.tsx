@@ -10,11 +10,15 @@ export function LobbyScreen({
   players,
   allReady,
   onStart,
+  spotifyConnected,
+  onConnectSpotify,
 }: {
   roomCode: string;
   players: PublicPlayerSummary[];
   allReady: boolean;
   onStart: () => void;
+  spotifyConnected: boolean;
+  onConnectSpotify: () => void;
 }) {
   const ready = players.filter((p) => p.status === "READY" && p.traits);
   const openSlots = Math.max(0, MAX_SLOTS - ready.length);
@@ -43,45 +47,77 @@ export function LobbyScreen({
 
       <JoinCard code={roomCode} />
 
-      <div
-        style={{
-          position: "absolute",
-          right: 64,
-          top: 78,
-          display: "flex",
-          gap: 12,
-          alignItems: "center",
-          background: "rgba(36,26,46,.85)",
-          borderRadius: 999,
-          padding: "14px 26px",
-        }}
-      >
-        <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#7BE0A8" }} />
-        <div style={{ font: "700 24px 'Fredoka',sans-serif", color: "#FFF3E8" }}>
-          {ready.length} / {MAX_SLOTS} joueurs
-        </div>
-      </div>
-
-      {allReady && (
-        <button
-          onClick={onStart}
+      <div style={{ position: "absolute", right: 64, top: 78, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 12 }}>
+        <div
           style={{
-            position: "absolute",
-            right: 64,
-            top: 140,
-            border: "none",
-            cursor: "pointer",
-            font: "700 22px 'Fredoka',sans-serif",
-            color: "#452A05",
-            background: "#FFB34D",
-            padding: "14px 30px",
+            display: "flex",
+            gap: 12,
+            alignItems: "center",
+            background: "rgba(36,26,46,.85)",
             borderRadius: 999,
-            boxShadow: "0 8px 0 #C9832F",
+            padding: "14px 26px",
           }}
         >
-          Lancer la partie
-        </button>
-      )}
+          <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#7BE0A8" }} />
+          <div style={{ font: "700 24px 'Fredoka',sans-serif", color: "#FFF3E8" }}>
+            {ready.length} / {MAX_SLOTS} joueurs
+          </div>
+        </div>
+
+        {allReady && (
+          <button
+            onClick={onStart}
+            style={{
+              border: "none",
+              cursor: "pointer",
+              font: "700 22px 'Fredoka',sans-serif",
+              color: "#452A05",
+              background: "#FFB34D",
+              padding: "14px 30px",
+              borderRadius: 999,
+              boxShadow: "0 8px 0 #C9832F",
+            }}
+          >
+            Lancer la partie
+          </button>
+        )}
+
+        {spotifyConnected ? (
+          <div
+            style={{
+              display: "flex",
+              gap: 10,
+              alignItems: "center",
+              background: "rgba(29,185,84,.18)",
+              border: "2px solid #1DB954",
+              borderRadius: 999,
+              padding: "10px 20px",
+            }}
+          >
+            <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#1DB954" }} />
+            <div style={{ font: "700 16px 'Fredoka',sans-serif", color: "#7BE0A8" }}>Spotify connecté</div>
+          </div>
+        ) : (
+          <button
+            onClick={onConnectSpotify}
+            style={{
+              border: "none",
+              cursor: "pointer",
+              display: "flex",
+              gap: 10,
+              alignItems: "center",
+              font: "700 16px 'Fredoka',sans-serif",
+              color: "#06331A",
+              background: "#1DB954",
+              padding: "10px 20px",
+              borderRadius: 999,
+              boxShadow: "0 5px 0 #148A3E",
+            }}
+          >
+            Connecter Spotify (Premium)
+          </button>
+        )}
+      </div>
 
       <div
         style={{

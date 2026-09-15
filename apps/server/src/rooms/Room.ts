@@ -66,6 +66,11 @@ export class Room {
    * internal timers. */
   phaseEnteredAt = Date.now();
   hostConnectionId: string | null = null;
+  /** The host's Spotify Premium tokens (Web Playback SDK), one session per room —
+   * set by the host OAuth callback route, read/refreshed by the `/spotify/host/token`
+   * route the SDK polls. `null` means the host hasn't connected Spotify (or skipped
+   * it) — the game still runs, just silently, matching the pre-integration MVP. */
+  hostSpotifyTokens: { accessToken: string; refreshToken: string; expiresAt: number } | null = null;
   maxRounds = DEFAULT_MAX_ROUNDS;
   readonly players = new Map<string, PlayerRecord>();
   readonly rounds: RoundRecord[] = [];
@@ -95,10 +100,20 @@ export class Room {
       traits: null,
       score: 0,
       connectionId: null,
-      topTracks: this.spotify.getTopTracksForPlayer(id),
+      // Empty until either real Spotify OAuth completes (setPlayerTopTracks, called
+      // from the OAuth callback route) or startGame() fills in a fixture fallback
+      // for anyone who skipped/never finished connecting.
+      topTracks: [],
     };
     this.players.set(id, player);
     return player;
+  }
+
+  /** Called by the Spotify OAuth callback route once a player's real top tracks
+   * have been fetched. */
+  setPlayerTopTracks(playerId: string, tracks: StubTrack[]): void {
+    const p = this.players.get(playerId);
+    if (p) p.topTracks = tracks;
   }
 
   findByRejoinToken(token: string): PlayerRecord | null {
@@ -145,6 +160,11 @@ export class Room {
   startGame(maxRounds: number | undefined, now: number): boolean {
     if (this.phase !== "LOBBY" || !this.allReady) return false;
     this.maxRounds = maxRounds && maxRounds > 0 ? Math.floor(maxRounds) : DEFAULT_MAX_ROUNDS;
+    // Anyone who never completed (or skipped) Spotify OAuth still needs a track to
+    // own — fall back to the stub fixture pool so the game never breaks.
+    for (const p of this.players.values()) {
+      if (p.topTracks.length === 0) p.topTracks = this.spotify.getTopTracksForPlayer(p.id);
+    }
     const assignments = new Map(
       [...this.players.entries()].map(([id, p]) => [id, p.topTracks] as const),
     );

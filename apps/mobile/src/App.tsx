@@ -10,6 +10,7 @@ import {
   type HairStyle,
 } from "@grille/shared";
 import { Stage } from "./components/Stage.js";
+import { serverHttpBase } from "./lib/serverHttpBase.js";
 import { useMobileSocket } from "./state/useMobileSocket.js";
 import type { VoteCard } from "./state/useMockMobileState.js";
 import { JoinScreen } from "./screens/JoinScreen.js";
@@ -29,7 +30,14 @@ export function App() {
     useMobileSocket();
 
   const [code, setCode] = useState("");
-  const [spotifyDone, setSpotifyDone] = useState(false);
+  // Connecting Spotify navigates away to accounts.spotify.com and back — every bit
+  // of React state is lost on that round trip except what's in localStorage (the
+  // rejoin token, which useMobileSocket already restores) and the server's own
+  // room_state. The server callback appends ?spotify=ok|error to the return URL so
+  // this survives the reload; the rejoin-token flow restores everything else.
+  const [spotifyDone, setSpotifyDone] = useState(
+    () => new URLSearchParams(window.location.search).get("spotify") === "ok",
+  );
   const [hair, setHair] = useState<HairStyle>(DEFAULT_TRAITS.hair);
   const [skin, setSkin] = useState(DEFAULT_TRAITS.skin);
   const [outfit, setOutfit] = useState(DEFAULT_TRAITS.outfit);
@@ -51,6 +59,14 @@ export function App() {
   useEffect(() => {
     if (joinError) setCode("");
   }, [joinError]);
+
+  // Clean the ?spotify=ok|error param out of the URL once read, so a manual reload
+  // doesn't re-trigger it.
+  useEffect(() => {
+    if (window.location.search.includes("spotify=")) {
+      window.history.replaceState(null, "", window.location.pathname);
+    }
+  }, []);
 
   // Reset the vote draft/lock whenever a new round starts.
   useEffect(() => {
@@ -122,7 +138,13 @@ export function App() {
           onSubmit={() => actions.submitTraits(draftTraits, name)}
         />
       ) : (
-        <SpotifyConnectScreen onConnect={() => setSpotifyDone(true)} onSkip={() => setSpotifyDone(true)} />
+        <SpotifyConnectScreen
+          onConnect={() => {
+            const roomCode = roomState?.roomCode ?? code;
+            window.location.href = `${serverHttpBase()}/spotify/player/login?roomCode=${encodeURIComponent(roomCode)}&playerId=${encodeURIComponent(myPlayerId)}`;
+          }}
+          onSkip={() => setSpotifyDone(true)}
+        />
       );
     }
 

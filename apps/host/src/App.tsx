@@ -1,12 +1,25 @@
+import { useEffect } from "react";
 import { useHostSocket } from "./state/useHostSocket.js";
 import { Stage } from "./components/Stage.js";
+import { serverHttpBase } from "./lib/serverHttpBase.js";
+import { useSpotifyPlayback } from "./lib/useSpotifyPlayback.js";
 import { LobbyScreen } from "./screens/LobbyScreen.js";
 import { RoundScreen } from "./screens/RoundScreen.js";
 import { RevealScreen } from "./screens/RevealScreen.js";
 import { LeaderboardScreen } from "./screens/LeaderboardScreen.js";
 
 export function App() {
-  const { roomState, voteProgress, roundResolved, leaderboard, actions } = useHostSocket();
+  const { roomState, voteProgress, roundResolved, leaderboard, spotifyCommand, actions } = useHostSocket();
+  const { connected: spotifyConnected } = useSpotifyPlayback(roomState?.roomCode ?? null, spotifyCommand);
+
+  // The host OAuth callback redirects back here with ?spotify=ok|error — nothing to
+  // read (useSpotifyPlayback's `connected` is the real signal once the SDK confirms
+  // it), just tidy the URL.
+  useEffect(() => {
+    if (window.location.search.includes("spotify=")) {
+      window.history.replaceState(null, "", window.location.pathname);
+    }
+  }, []);
 
   return (
     <>
@@ -27,6 +40,10 @@ export function App() {
             players={roomState.players}
             allReady={roomState.allReady}
             onStart={() => actions.startGame()}
+            spotifyConnected={spotifyConnected}
+            onConnectSpotify={() => {
+              window.location.href = `${serverHttpBase()}/spotify/host/login?roomCode=${encodeURIComponent(roomState.roomCode)}`;
+            }}
           />
         );
       case "VOTING":

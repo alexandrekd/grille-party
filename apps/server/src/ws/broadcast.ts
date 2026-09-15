@@ -88,3 +88,19 @@ export function leaderboardMessage(room: Room, isFinal: boolean): LeaderboardMes
 export function broadcastLeaderboard(registry: ConnectionRegistry, room: Room, isFinal: boolean): void {
   broadcastToRoom(registry, room, leaderboardMessage(room, isFinal));
 }
+
+function sendToHost(registry: ConnectionRegistry, room: Room, msg: HostBoundMessage): void {
+  if (!room.hostConnectionId) return;
+  const ws = registry.getSocket(room.hostConnectionId);
+  if (ws) sendHost(ws, msg);
+}
+
+/** Host-only — see `PlayTrackMessage`'s doc comment in packages/shared for why this
+ * never reaches players. */
+export function sendPlayTrackToHost(registry: ConnectionRegistry, room: Room, trackUri: string): void {
+  sendToHost(registry, room, { type: "play_track", trackUri });
+}
+
+export function sendStopTrackToHost(registry: ConnectionRegistry, room: Room): void {
+  sendToHost(registry, room, { type: "stop_track" });
+}

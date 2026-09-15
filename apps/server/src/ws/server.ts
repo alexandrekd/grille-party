@@ -18,8 +18,19 @@ import {
   broadcastVoteProgress,
   leaderboardMessage,
   roundResolvedMessage,
+  sendPlayTrackToHost,
+  sendStopTrackToHost,
 } from "./broadcast.js";
 import { newId } from "../util/id.js";
+import { trackUriFor } from "../integrations/spotify/oauth.js";
+
+/** Fires the host-only Spotify play command for whatever round is now current —
+ * a no-op on the host side if it never connected Spotify (see PlayTrackMessage's
+ * doc comment: the host silently ignores it, same as the pre-integration MVP). */
+function playCurrentRound(registry: ConnectionRegistry, room: Room): void {
+  const round = room.currentRound;
+  if (round) sendPlayTrackToHost(registry, room, trackUriFor(round.track.id));
+}
 
 const SCHEDULER_TICK_MS = 500;
 
@@ -62,6 +73,10 @@ function resyncConnection(raw: WebSocket, room: Room, role: "host" | "player"): 
     if (msg) send(raw, msg);
   } else if (room.phase === "LEADERBOARD" || room.phase === "GAME_OVER") {
     send(raw, leaderboardMessage(room, room.phase === "GAME_OVER"));
+  } else if (role === "host" && room.phase === "VOTING" && room.currentRound) {
+    // A reloaded host needs Spotify told to resume this round's track — it isn't
+    // still playing on its own after a page reload re-inits the Web Playback SDK.
+    sendHost(raw, { type: "play_track", trackUri: trackUriFor(room.currentRound.track.id) });
   }
 }
 
@@ -137,7 +152,10 @@ function handleMessage(
       if (!room || meta.role !== "host") return;
       const started = room.startGame(msg.maxRounds, Date.now());
       broadcastRoomState(registry, room);
-      if (started) broadcastVoteProgress(registry, room);
+      if (started) {
+        broadcastVoteProgress(registry, room);
+        playCurrentRound(registry, room);
+      }
       return;
     }
 
@@ -157,6 +175,7 @@ function handleMessage(
       sendPlayer(raw, { type: "vote_ack", roundId: msg.roundId, votedForPlayerId: msg.votedForPlayerId });
       if (wasVoting && room.phase === "REVEAL") {
         // submitVote's own resolution (last vote in) already flipped the phase.
+        sendStopTrackToHost(registry, room);
         broadcastRoomState(registry, room);
         broadcastRoundResolved(registry, room);
       } else {
@@ -205,6 +224,7 @@ function advancePhase(registry: ConnectionRegistry, room: Room): void {
     broadcastRoomState(registry, room);
     if (startedNext) {
       broadcastVoteProgress(registry, room);
+      playCurrentRound(registry, room);
     } else {
       const phaseAfter: string = room.phase;
       if (phaseAfter === "GAME_OVER") broadcastLeaderboard(registry, room, true);
@@ -235,6 +255,7 @@ function tickAll(registry: ConnectionRegistry, roomManager: RoomManager): void {
     if (room.phase === "VOTING") {
       const resolved = room.maybeExpireVote(now);
       if (resolved) {
+        sendStopTrackToHost(registry, room);
         broadcastRoomState(registry, room);
         broadcastRoundResolved(registry, room);
       }
