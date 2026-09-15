@@ -1,5 +1,6 @@
 import {
   DEFAULT_MAX_ROUNDS,
+  LEADER_REASSIGN_GRACE_MS,
   MIN_VOTE_WINDOW_MS,
   validateTraits,
   type DancerTraits,
@@ -69,10 +70,14 @@ export class Room {
   phaseEnteredAt = Date.now();
   hostConnectionId: string | null = null;
   /** The first player to join controls the game from their phone (start, skip
-   * REVEAL/LEADERBOARD) — the TV has no clickable controls. Fixed once assigned,
-   * even if that player later disconnects (same no-reassignment stance as the host
-   * connection — a known limitation, not something to fix for the MVP). */
+   * REVEAL/LEADERBOARD) — the TV has no clickable controls. Reassigned to another
+   * connected player if the leader stays disconnected past LEADER_REASSIGN_GRACE_MS
+   * (see reassignLeaderIfStale) — a brief drop doesn't cost them the role, only a
+   * departure that outlasts the grace period does. */
   leaderPlayerId: string | null = null;
+  /** Set when the current leader disconnects, cleared if they reconnect before the
+   * grace period elapses — see reassignLeaderIfStale. */
+  private leaderDisconnectedAt: number | null = null;
   /** The host's Spotify Premium tokens (Web Playback SDK), one session per room —
    * set by the host OAuth callback route, read/refreshed by the `/spotify/host/token`
    * route the SDK polls. `null` means the host hasn't connected Spotify (or skipped
@@ -131,9 +136,31 @@ export class Room {
     return null;
   }
 
-  setPlayerConnection(playerId: string, connectionId: string | null): void {
+  setPlayerConnection(playerId: string, connectionId: string | null, now = Date.now()): void {
     const p = this.players.get(playerId);
-    if (p) p.connectionId = connectionId;
+    if (!p) return;
+    p.connectionId = connectionId;
+    if (playerId !== this.leaderPlayerId) return;
+    if (connectionId === null) {
+      this.leaderDisconnectedAt = now;
+    } else {
+      // The leader reconnected before reassignLeaderIfStale acted — cancel it.
+      this.leaderDisconnectedAt = null;
+    }
+  }
+
+  /** Call periodically (see tickAll): reassigns leadership to the first other
+   * connected player once the current leader has been disconnected for at least
+   * LEADER_REASSIGN_GRACE_MS. No-ops (and keeps retrying next tick) if no other
+   * player is currently connected to hand it to. Returns true if it reassigned. */
+  reassignLeaderIfStale(now: number): boolean {
+    if (this.leaderDisconnectedAt === null) return false;
+    if (now - this.leaderDisconnectedAt < LEADER_REASSIGN_GRACE_MS) return false;
+    const next = [...this.players.values()].find((p) => p.connectionId !== null);
+    if (!next) return false;
+    this.leaderPlayerId = next.id;
+    this.leaderDisconnectedAt = null;
+    return true;
   }
 
   setHostConnection(connectionId: string): void {

@@ -29,6 +29,7 @@ export function LeaderLobbyScreen({
   const confetti = useMemo(() => mobileConfetti(8), []);
   const [maxRounds, setMaxRounds] = useState(DEFAULT_MAX_ROUNDS);
   const stillDrawing = Math.max(0, maxSlots - lobbyChars.length - 1);
+  const disconnectedCount = lobbyChars.filter((c) => !c.connected).length;
 
   return (
     <PhoneFrame bg="radial-gradient(100% 60% at 50% 12%,#3B2749 0%,#1A1322 58%,#120E18 100%)">
@@ -74,6 +75,11 @@ export function LeaderLobbyScreen({
           <div style={{ font: "700 14px 'Nunito',sans-serif", letterSpacing: ".2em", color: "#8E7F92" }}>SUR LA PISTE</div>
           <div style={{ font: "700 18px 'Fredoka',sans-serif", color: "#FFB34D" }}>{lobbyChars.length + 1} / {maxSlots}</div>
         </div>
+        {disconnectedCount > 0 && (
+          <div style={{ font: "700 13px 'Nunito',sans-serif", color: "#FF6B5A", marginTop: 10 }}>
+            🔌 {disconnectedCount} joueur{disconnectedCount > 1 ? "s" : ""} déconnecté{disconnectedCount > 1 ? "s" : ""}
+          </div>
+        )}
       </div>
 
       <div style={{ position: "absolute", left: 24, right: 24, bottom: 56 }}>

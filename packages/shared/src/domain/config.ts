@@ -18,3 +18,9 @@ export const POINTS_CORRECT_STEP = 2;
 export const POINTS_CORRECT_MIN = 2;
 export const POINTS_OWNER_WRONG = -10;
 export const POINTS_UNNOTICED_BONUS_PER_MISSED_VOTER = 5;
+/** How long the room's leader can stay disconnected before another connected
+ * player takes over — long enough that a WiFi blip (which the WS heartbeat/HTTP
+ * poll backstop should already recover from well within this) doesn't cost them
+ * the role, short enough that the game isn't stuck waiting on someone who's
+ * actually left for good. */
+export const LEADER_REASSIGN_GRACE_MS = 30_000;

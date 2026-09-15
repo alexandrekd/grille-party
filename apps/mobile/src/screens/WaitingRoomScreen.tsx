@@ -61,9 +61,12 @@ export function WaitingRoomScreen({
         </div>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           {lobbyChars.map((c) => (
-            <div key={c.id} style={{ width: 60, height: 96, borderRadius: 18, background: "#1D1626", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", paddingBottom: 6, overflow: "hidden" }}>
-              {c.traits && <Dancer traits={c.traits} reaction="dance" scale={0.3} showName={false} />}
+            <div key={c.id} style={{ position: "relative", width: 60, height: 96, borderRadius: 18, background: "#1D1626", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", paddingBottom: 6, overflow: "hidden", opacity: c.connected ? 1 : 0.5 }}>
+              {c.traits && <Dancer traits={c.traits} reaction="dance" scale={0.3} dim={!c.connected} showName={false} />}
               <div style={{ font: "700 13px 'Fredoka',sans-serif", color: "#C9B6D2", marginTop: 4 }}>{c.name}</div>
+              {!c.connected && (
+                <div style={{ position: "absolute", top: 4, right: 4, font: "12px sans-serif" }}>🔌</div>
+              )}
             </div>
           ))}
           <div style={{ width: 60, height: 96, borderRadius: 18, border: "3px dashed #3A2E48", display: "flex", alignItems: "center", justifyContent: "center", font: "700 22px 'Fredoka',sans-serif", color: "#5A4A66" }}>

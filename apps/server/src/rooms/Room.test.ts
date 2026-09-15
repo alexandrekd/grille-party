@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { Room } from "./Room.js";
 import type { SpotifyProvider, StubTrack } from "../integrations/spotify/index.js";
-import { DEFAULT_TRAITS } from "@grille/shared";
+import { DEFAULT_TRAITS, LEADER_REASSIGN_GRACE_MS } from "@grille/shared";
 
 /** A deterministic fake provider so tests don't depend on the fixture pool's
  * random shuffle — each player gets a small, predictable, non-overlapping set. */
@@ -59,6 +59,46 @@ describe("Room lobby", () => {
     expect(room.leaderPlayerId).toBe(a.id);
     expect(room.publicPlayers.find((p) => p.id === a.id)?.isLeader).toBe(true);
     expect(room.publicPlayers.find((p) => p.id === b.id)?.isLeader).toBe(false);
+  });
+
+  it("reassigns the leader to another connected player after the grace period, not before", () => {
+    const room = new Room("1234", fakeSpotify());
+    const a = room.addPlayer("A");
+    const b = room.addPlayer("B");
+    room.setPlayerConnection(a.id, "conn-a", 0);
+    room.setPlayerConnection(b.id, "conn-b", 0);
+    expect(room.leaderPlayerId).toBe(a.id);
+
+    room.setPlayerConnection(a.id, null, 1_000); // leader drops
+    expect(room.reassignLeaderIfStale(1_000 + LEADER_REASSIGN_GRACE_MS - 1)).toBe(false);
+    expect(room.leaderPlayerId).toBe(a.id);
+
+    expect(room.reassignLeaderIfStale(1_000 + LEADER_REASSIGN_GRACE_MS)).toBe(true);
+    expect(room.leaderPlayerId).toBe(b.id);
+    expect(room.publicPlayers.find((p) => p.id === b.id)?.isLeader).toBe(true);
+  });
+
+  it("cancels a pending reassignment if the leader reconnects within the grace period", () => {
+    const room = new Room("1234", fakeSpotify());
+    const a = room.addPlayer("A");
+    room.addPlayer("B");
+    room.setPlayerConnection(a.id, "conn-a", 0);
+
+    room.setPlayerConnection(a.id, null, 1_000);
+    room.setPlayerConnection(a.id, "conn-a-2", 1_500); // reconnects before grace elapses
+    expect(room.reassignLeaderIfStale(1_000 + LEADER_REASSIGN_GRACE_MS)).toBe(false);
+    expect(room.leaderPlayerId).toBe(a.id);
+  });
+
+  it("does not reassign if no other player is currently connected", () => {
+    const room = new Room("1234", fakeSpotify());
+    const a = room.addPlayer("A");
+    room.addPlayer("B"); // never connects
+    room.setPlayerConnection(a.id, "conn-a", 0);
+
+    room.setPlayerConnection(a.id, null, 1_000);
+    expect(room.reassignLeaderIfStale(1_000 + LEADER_REASSIGN_GRACE_MS)).toBe(false);
+    expect(room.leaderPlayerId).toBe(a.id);
   });
 });
 

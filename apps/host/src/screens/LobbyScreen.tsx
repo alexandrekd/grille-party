@@ -140,14 +140,27 @@ export function LobbyScreen({
         }}
       >
         {ready.map((p) => (
-          <Dancer
-            key={p.id}
-            traits={p.traits!}
-            label={p.name}
-            reaction="idle"
-            scale={0.86}
-            showName
-          />
+          <div key={p.id} style={{ position: "relative" }}>
+            <Dancer traits={p.traits!} label={p.name} reaction="idle" scale={0.86} dim={!p.connected} showName />
+            {!p.connected && (
+              <div
+                style={{
+                  position: "absolute",
+                  left: "50%",
+                  bottom: -18,
+                  transform: "translateX(-50%)",
+                  whiteSpace: "nowrap",
+                  font: "700 12px 'Nunito',sans-serif",
+                  color: "#FF6B5A",
+                  background: "rgba(36,26,46,.9)",
+                  borderRadius: 999,
+                  padding: "3px 10px",
+                }}
+              >
+                🔌 hors ligne
+              </div>
+            )}
+          </div>
         ))}
         {Array.from({ length: Math.min(openSlots, 3) }).map((_, i) => (
           <div

@@ -331,6 +331,8 @@ function handleDisconnect(registry: ConnectionRegistry, roomManager: RoomManager
 function tickAll(registry: ConnectionRegistry, roomManager: RoomManager): void {
   const now = Date.now();
   for (const room of roomManager.all()) {
+    if (room.reassignLeaderIfStale(now)) broadcastRoomState(registry, room);
+
     if (room.phase === "VOTING") {
       const resolved = room.maybeExpireVote(now);
       if (resolved) {

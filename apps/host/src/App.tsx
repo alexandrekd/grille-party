@@ -3,6 +3,7 @@ import { useHostSocket } from "./state/useHostSocket.js";
 import { Stage } from "./components/Stage.js";
 import { serverHttpBase } from "./lib/serverHttpBase.js";
 import { useSpotifyPlayback } from "./lib/useSpotifyPlayback.js";
+import { playApplause, playCrowdOhh, playLeaderboardJingle, playVictoryFanfare } from "./lib/sfx.js";
 import { LobbyScreen } from "./screens/LobbyScreen.js";
 import { RoundScreen } from "./screens/RoundScreen.js";
 import { RevealScreen } from "./screens/RevealScreen.js";
@@ -20,6 +21,25 @@ export function App() {
       window.history.replaceState(null, "", window.location.pathname);
     }
   }, []);
+
+  // Music only plays during VOTING — REVEAL/LEADERBOARD were dead silent
+  // otherwise, jarring between rounds. Triggered by the data itself (not just the
+  // phase) so it always picks the right sting even if this fires from a delayed
+  // WS message or the HTTP poll backstop catching up.
+  useEffect(() => {
+    if (!roundResolved) return;
+    const nonOwnerVotes = roundResolved.votes.filter((v) => v.voterId !== roundResolved.ownerPlayerId);
+    const correctCount = nonOwnerVotes.filter((v) => v.choiceId === roundResolved.ownerPlayerId).length;
+    const ratio = nonOwnerVotes.length > 0 ? correctCount / nonOwnerVotes.length : 0;
+    if (ratio >= 0.5) playApplause();
+    else playCrowdOhh();
+  }, [roundResolved?.roundId]);
+
+  useEffect(() => {
+    if (roomState?.phase === "LEADERBOARD") playLeaderboardJingle();
+    if (roomState?.phase === "GAME_OVER") playVictoryFanfare();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomState?.phase]);
 
   return (
     <>
