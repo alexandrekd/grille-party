@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0E0A13;}
+a{color:#FFB34D;text-decoration:none}a:hover{color:#FF6B5A}
+@keyframes fall{0%{transform:translateY(-80px) rotate(0);opacity:0}8%{opacity:1}100%{transform:translateY(760px) rotate(540deg);opacity:.9}}
+@keyframes sway{from{transform:rotate(-7deg)}to{transform:rotate(7deg)}}
+@keyframes floorpulse{from{opacity:.45;transform:translateX(-50%) scale(.94)}to{opacity:.85;transform:translateX(-50%) scale(1.04)}}
+@keyframes tilepulse{from{opacity:.25}to{opacity:.6}}
+@keyframes glowring{from{box-shadow:0 0 0 0 rgba(255,179,77,.45)}to{box-shadow:0 0 0 26px rgba(255,179,77,0)}}
+@keyframes slotblink{from{opacity:.35}to{opacity:.8}}
+@keyframes conepulse{from{opacity:.5}to{opacity:.9}}
+</style>
+</helmet>
+<div style="font-family:'Nunito',system-ui,sans-serif;background:#0E0A13;padding:64px;display:flex;flex-direction:column;gap:64px;width:2760px;">
+
+  <section style="display:flex;gap:48px;align-items:stretch;">
+    <div style="flex:0 0 760px;background:#171220;border-radius:36px;padding:52px;display:flex;flex-direction:column;gap:26px;">
+      <div style="font:700 18px 'Nunito',sans-serif;letter-spacing:.22em;color:#F7A8B8;">JEU DE SOIRÉE · TV + TÉLÉPHONES</div>
+      <div style="font:700 132px/0.92 'Fredoka',sans-serif;color:#FFF3E8;letter-spacing:-.02em;">GRILLÉ<span style="color:#FF6B5A;">!</span></div>
+      <div style="font:600 30px/1.35 'Nunito',sans-serif;color:#D6C7CF;max-width:560px;text-wrap:pretty;">Tes potes deviennent des personnages. La piste s'allume, la musique part — et il faut griller le bon.</div>
+      <div style="display:flex;gap:14px;margin-top:8px;">
+        <div style="padding:14px 24px;border-radius:999px;background:#FF6B5A;color:#2A1E2B;font:700 20px 'Fredoka',sans-serif;">4 à 8 joueurs</div>
+        <div style="padding:14px 24px;border-radius:999px;background:#241A2E;color:#FFC7D3;font:700 20px 'Fredoka',sans-serif;">8 rounds · 15 min</div>
+      </div>
+    </div>
+
+    <div style="flex:1;display:flex;flex-direction:column;gap:32px;">
+      <div style="background:#171220;border-radius:36px;padding:40px 44px;display:flex;flex-direction:column;gap:22px;">
+        <div style="font:700 16px 'Nunito',sans-serif;letter-spacing:.2em;color:#8E7F92;">PALETTE</div>
+        <div style="display:flex;gap:18px;">
+          <div style="flex:1;height:120px;border-radius:24px;background:#FF6B5A;display:flex;align-items:flex-end;padding:14px;font:700 17px 'Fredoka',sans-serif;color:#40170F;">Corail</div>
+          <div style="flex:1;height:120px;border-radius:24px;background:#FFB34D;display:flex;align-items:flex-end;padding:14px;font:700 17px 'Fredoka',sans-serif;color:#452A05;">Ambre</div>
+          <div style="flex:1;height:120px;border-radius:24px;background:#F7A8B8;display:flex;align-items:flex-end;padding:14px;font:700 17px 'Fredoka',sans-serif;color:#4A2029;">Rose poudré</div>
+          <div style="flex:1;height:120px;border-radius:24px;background:#FFF3E8;display:flex;align-items:flex-end;padding:14px;font:700 17px 'Fredoka',sans-serif;color:#2A1E2B;">Crème</div>
+          <div style="flex:1;height:120px;border-radius:24px;background:#4A3557;display:flex;align-items:flex-end;padding:14px;font:700 17px 'Fredoka',sans-serif;color:#EADCEF;">Prune</div>
+          <div style="flex:1;height:120px;border-radius:24px;background:#171220;border:2px solid #2E2438;display:flex;align-items:flex-end;padding:14px;font:700 17px 'Fredoka',sans-serif;color:#D6C7CF;">Nuit</div>
+        </div>
+        <div style="display:flex;gap:44px;align-items:flex-end;border-top:2px solid #241A2E;padding-top:24px;">
+          <div><div style="font:700 15px 'Nunito',sans-serif;letter-spacing:.2em;color:#8E7F92;margin-bottom:8px;">TITRES · FREDOKA 700</div><div style="font:700 56px 'Fredoka',sans-serif;color:#FFF3E8;">C'était Salomé !</div></div>
+          <div><div style="font:700 15px 'Nunito',sans-serif;letter-spacing:.2em;color:#8E7F92;margin-bottom:8px;">INTERFACE · NUNITO 700</div><div style="font:700 28px 'Nunito',sans-serif;color:#D6C7CF;">Votez sur vos téléphones</div></div>
+        </div>
+      </div>
+
+      <div style="background:#171220;border-radius:36px;padding:40px 44px 74px;display:flex;flex-direction:column;gap:18px;">
+        <div style="font:700 16px 'Nunito',sans-serif;letter-spacing:.2em;color:#8E7F92;">PERSONNAGES GÉNÉRÉS À PARTIR DES TRAITS DU JOUEUR</div>
+        <div style="display:flex;gap:26px;align-items:flex-end;">
+          <sc-for list="{{ lineup }}" as="c" hint-placeholder-count="6">
+            <dc-import name="Dancer" hint-size="130px,250px" label="{{ c.name }}" skin="{{ c.skin }}" hair-color="{{ c.hairColor }}" hair="{{ c.hair }}" outfit="{{ c.outfit }}" pants="{{ c.pants }}" acc="{{ c.acc }}" dance="{{ c.dance }}" delay="{{ c.delay }}" speed="{{ speed }}" reaction="{{ c.lineupReaction }}" scale="{{ c.lineupScale }}"></dc-import>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display:grid;grid-template-columns:1280px 1280px;gap:52px 72px;">
+
+    <div style="display:flex;flex-direction:column;gap:18px;">
+      <div style="display:flex;align-items:center;gap:14px;"><div style="width:14px;height:14px;border-radius:50%;background:#FFB34D;"></div><div style="font:700 26px 'Fredoka',sans-serif;color:#FFF3E8;">1 · Lobby</div><div style="font:600 20px 'Nunito',sans-serif;color:#8E7F92;">les persos débarquent un par un</div></div>
+      <div style="position:relative;width:1280px;height:720px;border-radius:28px;overflow:hidden;background:#171220;box-shadow:0 30px 70px rgba(0,0,0,.6);">
+        <div style="position:absolute;inset:0;background:radial-gradient(120% 95% at 50% 105%,#3B2749 0%,#1C1526 58%,#14101C 100%);"></div>
+        <div style="position:absolute;left:12%;top:-320px;width:420px;height:900px;background:radial-gradient(50% 50% at 50% 20%,rgba(255,179,77,.28),rgba(255,179,77,0) 70%);filter:blur(12px);transform-origin:50% 0;animation:sway 6s infinite alternate ease-in-out;"></div>
+        <div style="position:absolute;right:10%;top:-320px;width:420px;height:900px;background:radial-gradient(50% 50% at 50% 20%,rgba(247,168,184,.26),rgba(247,168,184,0) 70%);filter:blur(12px);transform-origin:50% 0;animation:sway 7.5s .8s infinite alternate-reverse ease-in-out;"></div>
+        <div style="position:absolute;left:0;right:0;bottom:0;height:290px;background:repeating-linear-gradient(90deg,rgba(255,243,232,.08) 0 2px,transparent 2px 72px),repeating-linear-gradient(0deg,rgba(255,243,232,.08) 0 2px,transparent 2px 64px);transform:perspective(620px) rotateX(64deg);transform-origin:bottom;animation:tilepulse 1.9s infinite alternate ease-in-out;"></div>
+        <div style="position:absolute;left:50%;bottom:-130px;width:1180px;height:400px;border-radius:50%;background:radial-gradient(50% 50% at 50% 50%,rgba(255,107,90,.34),rgba(255,107,90,0) 72%);animation:floorpulse 1.9s infinite alternate ease-in-out;"></div>
+
+        <div style="position:absolute;left:64px;top:74px;width:404px;background:#FFF3E8;border-radius:32px;padding:38px;display:flex;flex-direction:column;gap:22px;box-shadow:0 22px 0 rgba(0,0,0,.25);">
+          <div style="font:700 17px 'Nunito',sans-serif;letter-spacing:.2em;color:#C0483A;">REJOINS LA PISTE</div>
+          <div style="display:flex;gap:24px;align-items:center;">
+            <div style="width:150px;height:150px;border-radius:20px;background:repeating-linear-gradient(45deg,#E4D6C9 0 6px,#F4E8DC 6px 12px);display:flex;align-items:center;justify-content:center;font:600 11px 'Nunito',monospace;color:#7A6656;text-align:center;">QR CODE</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="font:700 18px 'Nunito',sans-serif;color:#7A6656;">ou tape le code</div>
+              <div style="display:flex;gap:9px;">
+                <div style="width:44px;height:58px;border-radius:14px;background:#FF6B5A;color:#FFF3E8;font:700 34px 'Fredoka',sans-serif;display:flex;align-items:center;justify-content:center;">4</div>
+                <div style="width:44px;height:58px;border-radius:14px;background:#FFB34D;color:#452A05;font:700 34px 'Fredoka',sans-serif;display:flex;align-items:center;justify-content:center;">8</div>
+                <div style="width:44px;height:58px;border-radius:14px;background:#F7A8B8;color:#4A2029;font:700 34px 'Fredoka',sans-serif;display:flex;align-items:center;justify-content:center;">2</div>
+                <div style="width:44px;height:58px;border-radius:14px;background:#4A3557;color:#FFF3E8;font:700 34px 'Fredoka',sans-serif;display:flex;align-items:center;justify-content:center;">1</div>
+              </div>
+            </div>
+          </div>
+          <div style="font:600 19px 'Nunito',sans-serif;color:#7A6656;">grille.party sur ton téléphone · construis ton perso en 30 s</div>
+        </div>
+
+        <div style="position:absolute;right:64px;top:78px;display:flex;gap:12px;align-items:center;background:rgba(36,26,46,.85);border-radius:999px;padding:14px 26px;">
+          <div style="width:12px;height:12px;border-radius:50%;background:#7BE0A8;"></div>
+          <div style="font:700 24px 'Fredoka',sans-serif;color:#FFF3E8;">5 / 8 joueurs</div>
+        </div>
+
+        <div style="position:absolute;left:0;right:0;bottom:96px;display:flex;justify-content:center;align-items:flex-end;gap:30px;padding-left:120px;">
+          <sc-for list="{{ lobbyChars }}" as="c" hint-placeholder-count="5">
+            <dc-import name="Dancer" hint-size="118px,226px" label="{{ c.name }}" skin="{{ c.skin }}" hair-color="{{ c.hairColor }}" hair="{{ c.hair }}" outfit="{{ c.outfit }}" pants="{{ c.pants }}" acc="{{ c.acc }}" dance="{{ c.dance }}" delay="{{ c.delay }}" speed="{{ speed }}" reaction="idle" scale="0.86" show-name="{{ showNames }}"></dc-import>
+          </sc-for>
+          <div style="width:86px;height:86px;border-radius:50%;border:4px dashed #5A4A66;display:flex;align-items:center;justify-content:center;font:700 30px 'Fredoka',sans-serif;color:#7A688A;animation:slotblink 1.6s infinite alternate;">?</div>
+          <div style="width:86px;height:86px;border-radius:50%;border:4px dashed #5A4A66;display:flex;align-items:center;justify-content:center;font:700 30px 'Fredoka',sans-serif;color:#7A688A;animation:slotblink 1.6s .4s infinite alternate;">?</div>
+          <div style="width:86px;height:86px;border-radius:50%;border:4px dashed #5A4A66;display:flex;align-items:center;justify-content:center;font:700 30px 'Fredoka',sans-serif;color:#7A688A;animation:slotblink 1.6s .8s infinite alternate;">?</div>
+        </div>
+        <div style="position:absolute;left:0;right:0;bottom:36px;text-align:center;font:700 25px 'Fredoka',sans-serif;color:#C9B6D2;">Salomé vient d'arriver sur la piste…</div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:18px;">
+      <div style="display:flex;align-items:center;gap:14px;"><div style="width:14px;height:14px;border-radius:50%;background:#FF6B5A;"></div><div style="font:700 26px 'Fredoka',sans-serif;color:#FFF3E8;">2 · Musique en cours</div><div style="font:600 20px 'Nunito',sans-serif;color:#8E7F92;">8 danses différentes, décalées</div></div>
+      <div style="position:relative;width:1280px;height:720px;border-radius:28px;overflow:hidden;background:#171220;box-shadow:0 30px 70px rgba(0,0,0,.6);">
+        <div style="position:absolute;inset:0;background:radial-gradient(120% 95% at 50% 105%,#452A52 0%,#201628 58%,#14101C 100%);"></div>
+        <div style="position:absolute;left:8%;top:-340px;width:460px;height:940px;background:radial-gradient(50% 50% at 50% 20%,rgba(255,107,90,.3),rgba(255,107,90,0) 70%);filter:blur(12px);transform-origin:50% 0;animation:sway 4.5s infinite alternate ease-in-out;"></div>
+        <div style="position:absolute;left:38%;top:-340px;width:460px;height:940px;background:radial-gradient(50% 50% at 50% 20%,rgba(255,179,77,.26),rgba(255,179,77,0) 70%);filter:blur(12px);transform-origin:50% 0;animation:sway 5.6s .5s infinite alternate-reverse ease-in-out;"></div>
+        <div style="position:absolute;right:6%;top:-340px;width:460px;height:940px;background:radial-gradient(50% 50% at 50% 20%,rgba(247,168,184,.28),rgba(247,168,184,0) 70%);filter:blur(12px);transform-origin:50% 0;animation:sway 6.4s 1s infinite alternate ease-in-out;"></div>
+        <div style="position:absolute;left:0;right:0;bottom:0;height:320px;background:repeating-linear-gradient(90deg,rgba(255,243,232,.09) 0 2px,transparent 2px 72px),repeating-linear-gradient(0deg,rgba(255,243,232,.09) 0 2px,transparent 2px 64px);transform:perspective(620px) rotateX(64deg);transform-origin:bottom;animation:tilepulse 1.1s infinite alternate ease-in-out;"></div>
+        <div style="position:absolute;left:50%;bottom:-140px;width:1240px;height:430px;border-radius:50%;background:radial-gradient(50% 50% at 50% 50%,rgba(255,107,90,.4),rgba(255,107,90,0) 72%);animation:floorpulse 1.05s infinite alternate ease-in-out;"></div>
+        <sc-for list="{{ confDance }}" as="p" hint-placeholder-count="14"><div style="{{ p.s }}"></div></sc-for>
+
+        <div style="position:absolute;left:56px;top:56px;display:flex;align-items:center;gap:18px;background:rgba(20,14,26,.72);border-radius:999px;padding:16px 30px 16px 20px;">
+          <div style="display:flex;align-items:flex-end;gap:4px;height:34px;">
+            <div style="width:7px;height:16px;border-radius:4px;background:#FF6B5A;animation:tilepulse .42s infinite alternate;"></div>
+            <div style="width:7px;height:30px;border-radius:4px;background:#FFB34D;animation:tilepulse .3s .1s infinite alternate;"></div>
+            <div style="width:7px;height:22px;border-radius:4px;background:#F7A8B8;animation:tilepulse .36s .05s infinite alternate;"></div>
+            <div style="width:7px;height:34px;border-radius:4px;background:#FFF3E8;animation:tilepulse .26s .15s infinite alternate;"></div>
+          </div>
+          <div><div style="font:700 15px 'Nunito',sans-serif;letter-spacing:.18em;color:#F7A8B8;">ROUND 3 · TITRE EN COURS</div><div style="font:700 28px 'Fredoka',sans-serif;color:#FFF3E8;">Qui danse toujours les yeux fermés ?</div></div>
+        </div>
+
+        <div style="position:absolute;right:56px;top:52px;width:104px;height:104px;border-radius:50%;background:conic-gradient(#FFB34D 0turn 0.62turn,rgba(255,243,232,.14) 0.62turn 1turn);display:flex;align-items:center;justify-content:center;">
+          <div style="width:80px;height:80px;border-radius:50%;background:#1A1322;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+            <div style="font:700 34px 'Fredoka',sans-serif;color:#FFF3E8;line-height:1;">12</div>
+            <div style="font:700 11px 'Nunito',sans-serif;letter-spacing:.14em;color:#8E7F92;">SEC</div>
+          </div>
+        </div>
+
+        <div style="position:absolute;left:0;right:0;bottom:326px;display:flex;justify-content:center;align-items:flex-end;gap:66px;">
+          <sc-for list="{{ danceBack }}" as="c" hint-placeholder-count="4">
+            <dc-import name="Dancer" hint-size="94px,180px" label="{{ c.name }}" skin="{{ c.skin }}" hair-color="{{ c.hairColor }}" hair="{{ c.hair }}" outfit="{{ c.outfit }}" pants="{{ c.pants }}" acc="{{ c.acc }}" dance="{{ c.dance }}" delay="{{ c.delay }}" speed="{{ speed }}" reaction="dance" scale="0.66" show-name="{{ false }}"></dc-import>
+          </sc-for>
+        </div>
+        <div style="position:absolute;left:0;right:0;bottom:104px;display:flex;justify-content:center;align-items:flex-end;gap:36px;">
+          <sc-for list="{{ danceFront }}" as="c" hint-placeholder-count="4">
+            <dc-import name="Dancer" hint-size="130px,250px" label="{{ c.name }}" skin="{{ c.skin }}" hair-color="{{ c.hairColor }}" hair="{{ c.hair }}" outfit="{{ c.outfit }}" pants="{{ c.pants }}" acc="{{ c.acc }}" dance="{{ c.dance }}" delay="{{ c.delay }}" speed="{{ speed }}" reaction="dance" scale="0.98" show-name="{{ showNames }}"></dc-import>
+          </sc-for>
+        </div>
+        <div style="position:absolute;left:0;right:0;bottom:34px;text-align:center;"><span style="font:700 24px 'Fredoka',sans-serif;color:#2A1E2B;background:#FFF3E8;padding:12px 30px;border-radius:999px;">Votez sur vos téléphones · 6 votes sur 8</span></div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:18px;">
+      <div style="display:flex;align-items:center;gap:14px;"><div style="width:14px;height:14px;border-radius:50%;background:#F7A8B8;"></div><div style="font:700 26px 'Fredoka',sans-serif;color:#FFF3E8;">3 · Révélation</div><div style="font:600 20px 'Nunito',sans-serif;color:#8E7F92;">le grillé se cache, les autres réagissent</div></div>
+      <div style="position:relative;width:1280px;height:720px;border-radius:28px;overflow:hidden;background:#171220;box-shadow:0 30px 70px rgba(0,0,0,.6);">
+        <div style="position:absolute;inset:0;background:radial-gradient(120% 95% at 50% 105%,#2E2038 0%,#1A1322 58%,#120E18 100%);"></div>
+        <div style="position:absolute;left:50%;top:-40px;width:520px;height:640px;margin-left:-260px;background:linear-gradient(to bottom,rgba(255,179,77,.42),rgba(255,179,77,.06) 78%,transparent);clip-path:polygon(38% 0,62% 0,100% 100%,0 100%);animation:conepulse 1.3s infinite alternate ease-in-out;"></div>
+        <div style="position:absolute;left:0;right:0;bottom:0;height:300px;background:repeating-linear-gradient(90deg,rgba(255,243,232,.06) 0 2px,transparent 2px 72px),repeating-linear-gradient(0deg,rgba(255,243,232,.06) 0 2px,transparent 2px 64px);transform:perspective(620px) rotateX(64deg);transform-origin:bottom;"></div>
+        <div style="position:absolute;left:50%;bottom:34px;width:560px;height:220px;border-radius:50%;transform:translateX(-50%);background:radial-gradient(50% 50% at 50% 50%,rgba(255,179,77,.5),rgba(255,179,77,0) 70%);"></div>
+        <sc-for list="{{ confWin }}" as="p" hint-placeholder-count="18"><div style="{{ p.s }}"></div></sc-for>
+
+        <div style="position:absolute;left:0;right:0;top:58px;text-align:center;">
+          <div style="font:700 19px 'Nunito',sans-serif;letter-spacing:.24em;color:#F7A8B8;">C'ÉTAIT…</div>
+          <div style="font:700 92px/1 'Fredoka',sans-serif;color:#FFF3E8;margin-top:6px;">SALOMÉ&nbsp;!</div>
+          <div style="font:700 28px 'Fredoka',sans-serif;color:#FFC7D3;margin-top:14px;">Grillée par 3 joueurs sur 7</div>
+        </div>
+
+        <div style="position:absolute;left:66px;bottom:150px;display:flex;align-items:flex-end;gap:34px;">
+          <sc-for list="{{ revealLeft }}" as="c" hint-placeholder-count="3">
+            <dc-import name="Dancer" hint-size="110px,212px" label="{{ c.name }}" skin="{{ c.skin }}" hair-color="{{ c.hairColor }}" hair="{{ c.hair }}" outfit="{{ c.outfit }}" pants="{{ c.pants }}" acc="{{ c.acc }}" dance="{{ c.dance }}" delay="{{ c.delay }}" speed="{{ speed }}" reaction="{{ c.reaction }}" scale="0.78" dim="{{ true }}"></dc-import>
+          </sc-for>
+        </div>
+        <div style="position:absolute;right:66px;bottom:150px;display:flex;align-items:flex-end;gap:34px;">
+          <sc-for list="{{ revealRight }}" as="c" hint-placeholder-count="3">
+            <dc-import name="Dancer" hint-size="110px,212px" label="{{ c.name }}" skin="{{ c.skin }}" hair-color="{{ c.hairColor }}" hair="{{ c.hair }}" outfit="{{ c.outfit }}" pants="{{ c.pants }}" acc="{{ c.acc }}" dance="{{ c.dance }}" delay="{{ c.delay }}" speed="{{ speed }}" reaction="{{ c.reaction }}" scale="0.78" dim="{{ true }}"></dc-import>
+          </sc-for>
+        </div>
+        <div style="position:absolute;left:50%;bottom:112px;transform:translateX(-50%);">
+          <dc-import name="Dancer" hint-size="168px,322px" label="Salomé" skin="#6E4227" hair-color="#1C1519" hair="bun" outfit="#FFF3E8" pants="#4A3557" acc="none" dance="4" reaction="caught" scale="1.28" glow="{{ true }}"></dc-import>
+        </div>
+
+        <div style="position:absolute;left:0;right:0;bottom:34px;display:flex;justify-content:center;gap:14px;">
+          <div style="font:700 22px 'Fredoka',sans-serif;color:#2A1E2B;background:#FFB34D;padding:12px 26px;border-radius:999px;">Marin +100</div>
+          <div style="font:700 22px 'Fredoka',sans-serif;color:#2A1E2B;background:#FFB34D;padding:12px 26px;border-radius:999px;">Ava +100</div>
+          <div style="font:700 22px 'Fredoka',sans-serif;color:#2A1E2B;background:#FFB34D;padding:12px 26px;border-radius:999px;">Kenza +100</div>
+          <div style="font:700 22px 'Fredoka',sans-serif;color:#C9B6D2;background:#2A1E33;padding:12px 26px;border-radius:999px;">Théo, Lila, Basile +0</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:18px;">
+      <div style="display:flex;align-items:center;gap:14px;"><div style="width:14px;height:14px;border-radius:50%;background:#FFF3E8;"></div><div style="font:700 26px 'Fredoka',sans-serif;color:#FFF3E8;">4 · Classement</div><div style="font:600 20px 'Nunito',sans-serif;color:#8E7F92;">une pose par place</div></div>
+      <div style="position:relative;width:1280px;height:720px;border-radius:28px;overflow:hidden;background:#171220;box-shadow:0 30px 70px rgba(0,0,0,.6);">
+        <div style="position:absolute;inset:0;background:radial-gradient(120% 95% at 42% 105%,#3B2749 0%,#1C1526 58%,#14101C 100%);"></div>
+        <div style="position:absolute;left:18%;top:-320px;width:420px;height:900px;background:radial-gradient(50% 50% at 50% 20%,rgba(255,179,77,.26),rgba(255,179,77,0) 70%);filter:blur(12px);transform-origin:50% 0;animation:sway 5.4s infinite alternate ease-in-out;"></div>
+        <div style="position:absolute;left:0;right:0;bottom:0;height:280px;background:repeating-linear-gradient(90deg,rgba(255,243,232,.07) 0 2px,transparent 2px 72px),repeating-linear-gradient(0deg,rgba(255,243,232,.07) 0 2px,transparent 2px 64px);transform:perspective(620px) rotateX(64deg);transform-origin:bottom;animation:tilepulse 1.6s infinite alternate ease-in-out;"></div>
+        <sc-for list="{{ confScore }}" as="p" hint-placeholder-count="10"><div style="{{ p.s }}"></div></sc-for>
+
+        <div style="position:absolute;left:58px;top:52px;">
+          <div style="font:700 17px 'Nunito',sans-serif;letter-spacing:.22em;color:#F7A8B8;">FIN DU ROUND 3 / 8</div>
+          <div style="font:700 62px/1 'Fredoka',sans-serif;color:#FFF3E8;margin-top:8px;">Classement</div>
+        </div>
+
+        <div style="position:absolute;left:56px;bottom:56px;display:flex;align-items:flex-end;gap:16px;">
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <dc-import name="Dancer" hint-size="116px,222px" label="Ava" skin="#A9714A" hair-color="#3A2A33" hair="ponytail" outfit="#F7A8B8" pants="#2B2136" acc="glasses" dance="2" reaction="laugh" scale="0.82"></dc-import>
+            <div style="width:170px;height:126px;margin-top:40px;border-radius:22px 22px 0 0;background:#4A3557;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;">
+              <div style="font:700 44px 'Fredoka',sans-serif;color:#FFC7D3;line-height:1;">2</div>
+              <div style="font:700 22px 'Fredoka',sans-serif;color:#FFF3E8;">620 pts</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <dc-import name="Dancer" hint-size="134px,258px" label="Marin" skin="#8A5A3B" hair-color="#1C1519" hair="afro" outfit="#FFB34D" pants="#2B2136" acc="glasses" dance="1" reaction="win" scale="0.98"></dc-import>
+            <div style="width:190px;height:186px;margin-top:40px;border-radius:24px 24px 0 0;background:#FFB34D;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;animation:glowring 1.8s infinite;">
+              <div style="font:700 62px 'Fredoka',sans-serif;color:#452A05;line-height:1;">1</div>
+              <div style="font:700 26px 'Fredoka',sans-serif;color:#452A05;">780 pts</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <dc-import name="Dancer" hint-size="110px,212px" label="Théo" skin="#F0C39A" hair-color="#C9803A" hair="curly" outfit="#E8553F" pants="#2B2136" acc="headphones" dance="5" reaction="sad" scale="0.78"></dc-import>
+            <div style="width:160px;height:92px;margin-top:40px;border-radius:20px 20px 0 0;background:#32243E;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;">
+              <div style="font:700 38px 'Fredoka',sans-serif;color:#FFC7D3;line-height:1;">3</div>
+              <div style="font:700 20px 'Fredoka',sans-serif;color:#D6C7CF;">540 pts</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="position:absolute;right:54px;top:150px;width:400px;display:flex;flex-direction:column;gap:12px;">
+          <sc-for list="{{ board }}" as="r" hint-placeholder-count="5">
+            <div style="display:flex;align-items:center;gap:18px;background:rgba(36,26,46,.82);border-radius:20px;padding:14px 22px;">
+              <div style="font:700 26px 'Fredoka',sans-serif;color:#8E7F92;width:34px;">{{ r.rank }}</div>
+              <div style="{{ r.dot }}"></div>
+              <div style="flex:1;font:700 27px 'Fredoka',sans-serif;color:#FFF3E8;">{{ r.name }}</div>
+              <div style="font:700 25px 'Fredoka',sans-serif;color:#FFB34D;">{{ r.pts }}</div>
+            </div>
+          </sc-for>
+          <div style="font:600 20px 'Nunito',sans-serif;color:#8E7F92;padding-left:8px;">Prochain round dans 5 s · préparez vos pouces</div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;tempo&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:1,&quot;min&quot;:0.6,&quot;max&quot;:1.8,&quot;step&quot;:0.1,&quot;unit&quot;:&quot;×&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Ambiance&quot;},&quot;showNames&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Ambiance&quot;},&quot;confettiOn&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Ambiance&quot;}}">
+const CHARS = [
+  {name:'Marin',   skin:'#8A5A3B', hairColor:'#1C1519', hair:'afro',     outfit:'#FFB34D', pants:'#2B2136', acc:'glasses',    dance:1, delay:'0s'},
+  {name:'Lila',    skin:'#F5CFA8', hairColor:'#F7A8B8', hair:'long',     outfit:'#4A3557', pants:'#E8553F', acc:'hoops',      dance:2, delay:'-.21s'},
+  {name:'Noé',     skin:'#C98B5E', hairColor:'#2B1D18', hair:'buzz',     outfit:'#FF6B5A', pants:'#2B2136', acc:'cap',        dance:3, delay:'-.43s'},
+  {name:'Salomé',  skin:'#6E4227', hairColor:'#1C1519', hair:'bun',      outfit:'#FFF3E8', pants:'#4A3557', acc:'none',       dance:4, delay:'-.12s'},
+  {name:'Théo',    skin:'#F0C39A', hairColor:'#C9803A', hair:'curly',    outfit:'#E8553F', pants:'#2B2136', acc:'headphones', dance:5, delay:'-.34s'},
+  {name:'Ava',     skin:'#A9714A', hairColor:'#3A2A33', hair:'ponytail', outfit:'#F7A8B8', pants:'#2B2136', acc:'glasses',    dance:6, delay:'-.55s'},
+  {name:'Kenza',   skin:'#E0A97B', hairColor:'#1F1720', hair:'bob',      outfit:'#FFCE85', pants:'#4A3557', acc:'hoops',      dance:2, delay:'-.66s'},
+  {name:'Basile',  skin:'#F7DCC0', hairColor:'#E6C28A', hair:'bob',      outfit:'#4A3557', pants:'#2B2136', acc:'cap',        dance:3, delay:'-.28s'}
+];
+const COLORS = ['#FF6B5A','#FFB34D','#F7A8B8','#FFF3E8','#E8553F'];
+
+function conf(n, seed, opts) {
+  const o = opts || {};
+  const out = [];
+  let s = seed;
+  const rnd = () => (s = (s * 9301 + 49297) % 233280) / 233280;
+  for (let i = 0; i < n; i++) {
+    const w = 8 + Math.round(rnd() * 9);
+    const h = o.round ? w : 5 + Math.round(rnd() * 8);
+    const left = o.spread ? (o.spread[0] + rnd() * (o.spread[1] - o.spread[0])) : rnd() * 100;
+    const dur = (2.6 + rnd() * 2.8).toFixed(2);
+    const del = (-rnd() * 5).toFixed(2);
+    out.push({ s: `position:absolute;top:-60px;left:${left.toFixed(1)}%;width:${w}px;height:${h}px;border-radius:${o.round ? '50%' : '3px'};background:${COLORS[Math.floor(rnd() * COLORS.length)]};opacity:.9;animation:fall ${dur}s ${del}s infinite linear;` });
+  }
+  return out;
+}
+
+class Component extends DCLogic {
+  renderVals() {
+    const by = n => CHARS.find(c => c.name === n);
+    const lineupReactions = ['dance', 'laugh', 'surprise', 'dance', 'win', 'dodge'];
+    const speed = +(this.props.tempo ?? 1);
+    const showNames = this.props.showNames !== false;
+    const cOn = this.props.confettiOn !== false;
+    return {
+      speed, showNames,
+      lineup: CHARS.slice(0, 6).map((c, i) => Object.assign({}, c, { lineupReaction: lineupReactions[i], lineupScale: 0.86 })),
+      lobbyChars: ['Marin', 'Lila', 'Noé', 'Théo', 'Salomé'].map(by),
+      danceBack: ['Lila', 'Basile', 'Kenza', 'Noé'].map(by),
+      danceFront: ['Marin', 'Salomé', 'Théo', 'Ava'].map(by),
+      revealLeft: [
+        Object.assign({}, by('Théo'), { reaction: 'surprise' }),
+        Object.assign({}, by('Lila'), { reaction: 'laugh' }),
+        Object.assign({}, by('Noé'), { reaction: 'dodge' })
+      ],
+      revealRight: [
+        Object.assign({}, by('Ava'), { reaction: 'laugh' }),
+        Object.assign({}, by('Kenza'), { reaction: 'surprise' }),
+        Object.assign({}, by('Basile'), { reaction: 'sad' })
+      ],
+      board: [
+        { rank: 4, name: 'Salomé', pts: 480, dot: this.dot('#FFF3E8') },
+        { rank: 5, name: 'Kenza', pts: 420, dot: this.dot('#FFCE85') },
+        { rank: 6, name: 'Lila', pts: 360, dot: this.dot('#4A3557') },
+        { rank: 7, name: 'Noé', pts: 300, dot: this.dot('#FF6B5A') },
+        { rank: 8, name: 'Basile', pts: 240, dot: this.dot('#F7A8B8') }
+      ],
+      confDance: cOn ? conf(16, 4821) : [],
+      confWin: cOn ? conf(22, 1337, { spread: [32, 68] }) : [],
+      confScore: cOn ? conf(10, 777, { round: true }) : []
+    };
+  }
+  dot(c) {
+    return `width:16px;height:16px;border-radius:50%;background:${c};flex:0 0 auto;`;
+  }
+}
+</script>
+</body>
+</html>

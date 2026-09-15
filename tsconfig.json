@@ -1,0 +1,10 @@
+{
+  "files": [],
+  "references": [
+    { "path": "packages/shared" },
+    { "path": "packages/characters" },
+    { "path": "apps/server" },
+    { "path": "apps/host" },
+    { "path": "apps/mobile" }
+  ]
+}

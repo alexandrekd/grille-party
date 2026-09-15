@@ -1,0 +1,192 @@
+/*
+ * Ported verbatim from project/Dancer.dc.html's <style> block. Deliberately plain,
+ * unscoped global CSS (not CSS Modules) — computeDancerStyles() below builds
+ * `animation:body${dance}` etc. as literal string references to these keyframe
+ * names, so scoping/hashing them would require remapping the references too. These
+ * names don't collide with anything else in the app.
+ */
+@keyframes body1 {
+  from {
+    transform: translateY(0) rotate(-4deg);
+  }
+  to {
+    transform: translateY(-10px) rotate(4deg);
+  }
+}
+@keyframes body2 {
+  from {
+    transform: translateY(0) scaleY(1);
+  }
+  to {
+    transform: translateY(-18px) scaleY(1.04);
+  }
+}
+@keyframes body3 {
+  from {
+    transform: translateX(-10px) rotate(-6deg);
+  }
+  to {
+    transform: translateX(10px) rotate(6deg);
+  }
+}
+@keyframes body4 {
+  from {
+    transform: rotate(-9deg) translateY(-2px);
+  }
+  to {
+    transform: rotate(9deg) translateY(2px);
+  }
+}
+@keyframes body5 {
+  from {
+    transform: translateY(2px) scaleY(0.96) scaleX(1.03);
+  }
+  to {
+    transform: translateY(-12px) scaleY(1.03) scaleX(0.98);
+  }
+}
+@keyframes body6 {
+  from {
+    transform: translateY(-14px) rotate(5deg);
+  }
+  to {
+    transform: translateY(2px) rotate(-5deg);
+  }
+}
+@keyframes al1 {
+  from {
+    transform: rotate(12deg);
+  }
+  to {
+    transform: rotate(-34deg);
+  }
+}
+@keyframes ar1 {
+  from {
+    transform: rotate(-12deg);
+  }
+  to {
+    transform: rotate(34deg);
+  }
+}
+@keyframes al2 {
+  from {
+    transform: rotate(-40deg);
+  }
+  to {
+    transform: rotate(-155deg);
+  }
+}
+@keyframes ar2 {
+  from {
+    transform: rotate(40deg);
+  }
+  to {
+    transform: rotate(155deg);
+  }
+}
+@keyframes al3 {
+  from {
+    transform: rotate(34deg);
+  }
+  to {
+    transform: rotate(2deg);
+  }
+}
+@keyframes ar3 {
+  from {
+    transform: rotate(-2deg);
+  }
+  to {
+    transform: rotate(-34deg);
+  }
+}
+@keyframes hd1 {
+  from {
+    transform: rotate(-7deg);
+  }
+  to {
+    transform: rotate(7deg);
+  }
+}
+@keyframes hd2 {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-6px);
+  }
+}
+@keyframes hd3 {
+  from {
+    transform: rotate(5deg) translateY(-3px);
+  }
+  to {
+    transform: rotate(-5deg) translateY(1px);
+  }
+}
+@keyframes shiver {
+  from {
+    transform: translateX(-2px) rotate(-1.5deg);
+  }
+  to {
+    transform: translateX(2px) rotate(1.5deg);
+  }
+}
+@keyframes laughb {
+  from {
+    transform: translateY(0) rotate(-3deg) scaleY(0.98);
+  }
+  to {
+    transform: translateY(-12px) rotate(3deg) scaleY(1.02);
+  }
+}
+@keyframes winjump {
+  0% {
+    transform: translateY(0) rotate(0);
+  }
+  35% {
+    transform: translateY(-34px) rotate(-6deg);
+  }
+  70% {
+    transform: translateY(0) rotate(4deg);
+  }
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+}
+@keyframes idlebob {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-6px);
+  }
+}
+@keyframes sweatdrop {
+  0% {
+    transform: translateY(-4px) scale(0.7);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(26px) scale(1);
+    opacity: 0;
+  }
+}
+@keyframes sparkpop {
+  0% {
+    transform: scale(0.4) rotate(0);
+    opacity: 0;
+  }
+  40% {
+    transform: scale(1.1) rotate(25deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.6) rotate(60deg);
+    opacity: 0;
+  }
+}

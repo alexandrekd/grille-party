@@ -1,0 +1,133 @@
+import type {
+  PublicPlayerSummary,
+  ResolvedVote,
+  RoomPhase,
+  ScoreDelta,
+  StandingEntry,
+  ReactionAssignment,
+} from "../domain/room.js";
+
+export interface JoinedAckMessage {
+  type: "joined";
+  playerId: string;
+  rejoinToken: string;
+  roomCode: string;
+}
+
+export interface HostRegisteredMessage {
+  type: "host_registered";
+  roomCode: string;
+}
+
+/** Public round info visible to EVERY audience before resolution — deliberately has no
+ * track title/artist and no vote data, so it is safe to broadcast identically to the
+ * host and to every player (including the song's owner). */
+export interface RoundPublicInfo {
+  roundId: string;
+  roundIndex: number;
+  votingDeadlineTs: number;
+}
+
+/**
+ * Full room snapshot. This type is shared verbatim by host and player connections —
+ * it structurally has no field capable of carrying a `voterId`/`choiceId` pair, which
+ * is what makes "the host never receives individual votes before resolution" a
+ * property of the type system rather than a broadcast-time filter that could be
+ * bypassed by a future refactor. Individual vote data only ever appears in
+ * `RoundResolvedMessage`, sent once a round is fully resolved.
+ */
+export interface RoomStateMessage {
+  type: "room_state";
+  roomCode: string;
+  phase: RoomPhase;
+  players: PublicPlayerSummary[];
+  round: RoundPublicInfo | null;
+  maxRounds: number;
+  roundIndex: number;
+  allReady: boolean;
+}
+
+/** Aggregate-only vote progress — identical shape/content for host and every player. */
+export interface VoteProgressMessage {
+  type: "vote_progress";
+  roundId: string;
+  votesReceived: number;
+  votesExpected: number;
+}
+
+/** Sent only back to the voter who cast it — never broadcast. */
+export interface VoteAckMessage {
+  type: "vote_ack";
+  roundId: string;
+  votedForPlayerId: string;
+}
+
+/** Sent to a rejoining player mid-round so their UI can restore a locked vote. */
+export interface MyVoteMessage {
+  type: "my_vote";
+  roundId: string;
+  votedForPlayerId: string | null;
+}
+
+/**
+ * Full per-voter breakdown — safe because it is only ever sent AFTER a round has
+ * resolved (all votes in, or the timer expired). This is the one message type in the
+ * whole protocol allowed to carry `votes`.
+ */
+export interface RoundResolvedMessage {
+  type: "round_resolved";
+  roundId: string;
+  ownerPlayerId: string;
+  track: { title: string; artist: string; coverUrl: string };
+  votes: ResolvedVote[];
+  scoreDeltas: ScoreDelta[];
+  newScores: { playerId: string; score: number }[];
+  reactions: ReactionAssignment[];
+}
+
+export interface LeaderboardMessage {
+  type: "leaderboard";
+  standings: StandingEntry[];
+  isFinal: boolean;
+  nextRoundInSec?: number;
+}
+
+export interface GameOverMessage {
+  type: "game_over";
+  standings: StandingEntry[];
+}
+
+export interface PlayerReconnectedMessage {
+  type: "player_reconnected";
+  playerId: string;
+}
+
+export interface PlayerDisconnectedMessage {
+  type: "player_disconnected";
+  playerId: string;
+}
+
+export interface ErrorMessage {
+  type: "error";
+  code: string;
+  message: string;
+}
+
+/** Broadcast/shared messages both audiences may receive. */
+export type SharedServerMessage =
+  | RoomStateMessage
+  | VoteProgressMessage
+  | RoundResolvedMessage
+  | LeaderboardMessage
+  | GameOverMessage
+  | PlayerReconnectedMessage
+  | PlayerDisconnectedMessage
+  | ErrorMessage;
+
+export type HostBoundMessage = SharedServerMessage | HostRegisteredMessage;
+
+export type PlayerBoundMessage =
+  | SharedServerMessage
+  | JoinedAckMessage
+  | VoteAckMessage
+  | MyVoteMessage;

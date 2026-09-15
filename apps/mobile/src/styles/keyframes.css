@@ -1,0 +1,67 @@
+/* Ported verbatim from project/Grille - Ecrans mobiles.dc.html's <style> block. */
+@keyframes mfall {
+  0% {
+    transform: translateY(-40px) rotate(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(900px) rotate(480deg);
+    opacity: 0.85;
+  }
+}
+@keyframes msway {
+  from {
+    transform: rotate(-8deg);
+  }
+  to {
+    transform: rotate(8deg);
+  }
+}
+@keyframes mpulse {
+  from {
+    opacity: 0.4;
+    transform: translateX(-50%) scale(0.95);
+  }
+  to {
+    opacity: 0.85;
+    transform: translateX(-50%) scale(1.05);
+  }
+}
+@keyframes mtile {
+  from {
+    opacity: 0.25;
+  }
+  to {
+    opacity: 0.6;
+  }
+}
+@keyframes mdots {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-5px);
+  }
+}
+@keyframes mring {
+  from {
+    box-shadow: 0 0 0 0 rgba(255, 107, 90, 0.5);
+  }
+  to {
+    box-shadow: 0 0 0 18px rgba(255, 107, 90, 0);
+  }
+}
+@keyframes mtap {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.03);
+  }
+}

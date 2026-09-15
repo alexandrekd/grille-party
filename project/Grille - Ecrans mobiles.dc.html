@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&amp;family=Nunito:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0E0A13;}
+a{color:#FFB34D;text-decoration:none}a:hover{color:#FF6B5A}
+@keyframes mfall{0%{transform:translateY(-40px) rotate(0);opacity:0}10%{opacity:1}100%{transform:translateY(900px) rotate(480deg);opacity:.85}}
+@keyframes msway{from{transform:rotate(-8deg)}to{transform:rotate(8deg)}}
+@keyframes mpulse{from{opacity:.4;transform:translateX(-50%) scale(.95)}to{opacity:.85;transform:translateX(-50%) scale(1.05)}}
+@keyframes mtile{from{opacity:.25}to{opacity:.6}}
+@keyframes mdots{0%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-5px)}}
+@keyframes mring{from{box-shadow:0 0 0 0 rgba(255,107,90,.5)}to{box-shadow:0 0 0 18px rgba(255,107,90,0)}}
+@keyframes mtap{from{transform:scale(1)}to{transform:scale(1.03)}}
+</style>
+</helmet>
+<div style="font-family:'Nunito',system-ui,sans-serif;background:#0E0A13;padding:64px;display:flex;flex-direction:column;gap:44px;width:3220px;">
+
+  <div style="display:flex;align-items:flex-end;gap:36px;">
+    <div>
+      <div style="font:700 17px 'Nunito',sans-serif;letter-spacing:.22em;color:#F7A8B8;">GRILLÉ ! · LA MANETTE</div>
+      <div style="font:700 86px/1 'Fredoka',sans-serif;color:#FFF3E8;margin-top:10px;">Écrans téléphone</div>
+    </div>
+    <div style="font:600 24px/1.4 'Nunito',sans-serif;color:#8E7F92;max-width:640px;text-wrap:pretty;padding-bottom:10px;">Six écrans, un seul objectif par écran. Boutons de 64 px minimum, texte crème sur nuit, tout lisible dans un salon éteint. Les vignettes de traits et la grille de vote sont cliquables.</div>
+  </div><div style="display:flex;gap:56px;align-items:flex-start;">
+
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div style="font:700 22px 'Fredoka',sans-serif;color:#FFF3E8;">1 · Rejoindre</div>
+      <div style="position:relative;width:390px;height:844px;border-radius:52px;background:#100C16;border:9px solid #241A2E;overflow:hidden;box-shadow:0 26px 60px rgba(0,0,0,.6);">
+        <div style="position:absolute;inset:0;background:radial-gradient(110% 70% at 50% 108%,#43284F 0%,#1C1526 55%,#120E18 100%);"></div>
+        <div style="position:absolute;left:12%;top:120px;width:200px;height:620px;background:radial-gradient(50% 50% at 50% 20%,rgba(255,179,77,.22),transparent 70%);filter:blur(10px);transform-origin:50% 0;animation:msway 5s infinite alternate ease-in-out;"></div>
+        <div style="position:absolute;right:8%;top:120px;width:200px;height:620px;background:radial-gradient(50% 50% at 50% 20%,rgba(247,168,184,.2),transparent 70%);filter:blur(10px);transform-origin:50% 0;animation:msway 6.4s .6s infinite alternate-reverse ease-in-out;"></div>
+        <div style="position:absolute;left:0;right:0;bottom:0;height:200px;background:repeating-linear-gradient(90deg,rgba(255,243,232,.07) 0 2px,transparent 2px 46px),repeating-linear-gradient(0deg,rgba(255,243,232,.07) 0 2px,transparent 2px 40px);transform:perspective(320px) rotateX(64deg);transform-origin:bottom;animation:mtile 1.4s infinite alternate ease-in-out;"></div>
+        <div style="position:absolute;left:50%;bottom:-60px;width:460px;height:200px;border-radius:50%;background:radial-gradient(50% 50% at 50% 50%,rgba(255,107,90,.4),transparent 70%);animation:mpulse 1.4s infinite alternate ease-in-out;"></div>
+        <div style="position:absolute;left:0;right:0;bottom:22px;display:flex;justify-content:center;align-items:flex-end;gap:14px;opacity:.6;">
+          <sc-for list="{{ bgChars }}" as="c" hint-placeholder-count="3">
+            <dc-import name="Dancer" hint-size="60px,115px" skin="{{ c.skin }}" hair-color="{{ c.hairColor }}" hair="{{ c.hair }}" outfit="{{ c.outfit }}" pants="{{ c.pants }}" acc="{{ c.acc }}" dance="{{ c.dance }}" delay="{{ c.delay }}" reaction="dance" scale="0.46" show-name="{{ false }}"></dc-import>
+          </sc-for>
+        </div>
+        <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(16,12,22,.9) 0%,rgba(16,12,22,.55) 46%,rgba(16,12,22,.85) 78%);"></div>
+
+        <div style="position:absolute;left:0;right:0;top:16px;display:flex;justify-content:space-between;padding:0 30px;font:700 14px 'Nunito',sans-serif;color:#8E7F92;"><span>21:42</span><span>••• ▮</span></div>
+
+        <div style="position:absolute;left:26px;right:26px;top:96px;display:flex;flex-direction:column;align-items:center;gap:8px;">
+          <div style="font:700 13px 'Nunito',sans-serif;letter-spacing:.26em;color:#F7A8B8;">JEU DE SOIRÉE</div>
+          <div style="font:700 74px/1 'Fredoka',sans-serif;color:#FFF3E8;">GRILLÉ<span style="color:#FF6B5A;">!</span></div>
+          <div style="font:600 19px 'Nunito',sans-serif;color:#C9B6D2;text-align:center;">Ton téléphone, c'est ta manette.</div>
+        </div>
+
+        <div style="position:absolute;left:26px;right:26px;bottom:34px;display:flex;flex-direction:column;gap:18px;">
+          <div style="height:76px;border-radius:26px;background:#FF6B5A;display:flex;align-items:center;justify-content:center;gap:14px;box-shadow:0 8px 0 #C0483A;animation:mring 2s infinite;">
+            <div style="width:34px;height:34px;border-radius:9px;background:repeating-linear-gradient(45deg,#2A1E2B 0 4px,transparent 4px 8px);"></div>
+            <div style="font:700 27px 'Fredoka',sans-serif;color:#2A1E2B;">Scanner le QR</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;"><div style="flex:1;height:2px;background:#2E2438;"></div><div style="font:700 15px 'Nunito',sans-serif;color:#8E7F92;">OU LE CODE TV</div><div style="flex:1;height:2px;background:#2E2438;"></div></div>
+          <div style="display:flex;gap:12px;">
+            <div style="flex:1;height:82px;border-radius:22px;background:#1D1626;border:3px solid #FFB34D;display:flex;align-items:center;justify-content:center;font:700 40px 'Fredoka',sans-serif;color:#FFF3E8;">4</div>
+            <div style="flex:1;height:82px;border-radius:22px;background:#1D1626;border:3px solid #2E2438;display:flex;align-items:center;justify-content:center;font:700 40px 'Fredoka',sans-serif;color:#FFF3E8;">8</div>
+            <div style="flex:1;height:82px;border-radius:22px;background:#1D1626;border:3px solid #2E2438;display:flex;align-items:center;justify-content:center;font:700 40px 'Fredoka',sans-serif;color:#5A4A66;">–</div>
+            <div style="flex:1;height:82px;border-radius:22px;background:#1D1626;border:3px solid #2E2438;display:flex;align-items:center;justify-content:center;font:700 40px 'Fredoka',sans-serif;color:#5A4A66;">–</div>
+          </div>
+          <div style="text-align:center;font:600 17px 'Nunito',sans-serif;color:#8E7F92;">Le code est affiché sur la télé</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div style="font:700 22px 'Fredoka',sans-serif;color:#FFF3E8;">2 · Ta musique</div>
+      <div style="position:relative;width:390px;height:844px;border-radius:52px;background:#100C16;border:9px solid #241A2E;overflow:hidden;box-shadow:0 26px 60px rgba(0,0,0,.6);">
+        <div style="position:absolute;inset:0;background:radial-gradient(100% 60% at 50% 0%,#2B2038 0%,#15101C 60%,#120E18 100%);"></div>
+        <div style="position:absolute;left:0;right:0;top:16px;display:flex;justify-content:space-between;padding:0 30px;font:700 14px 'Nunito',sans-serif;color:#8E7F92;"><span>21:43</span><span>••• ▮</span></div>
+
+        <div style="position:absolute;left:0;right:0;top:120px;display:flex;flex-direction:column;align-items:center;">
+          <div style="position:relative;width:250px;height:250px;border-radius:50%;background:radial-gradient(50% 50% at 50% 60%,rgba(255,179,77,.28),transparent 70%);display:flex;align-items:flex-end;justify-content:center;">
+            <div style="position:absolute;left:18px;top:34px;font:700 34px 'Fredoka',sans-serif;color:#FFB34D;animation:mdots 1.6s infinite;">♪</div>
+            <div style="position:absolute;right:26px;top:66px;font:700 26px 'Fredoka',sans-serif;color:#F7A8B8;animation:mdots 1.6s .4s infinite;">♫</div>
+            <dc-import name="Dancer" hint-size="122px,234px" skin="#F0C39A" hair-color="#C9803A" hair="curly" outfit="#FF6B5A" pants="#2B2136" acc="headphones" dance="5" reaction="dance" scale="0.94" show-name="{{ false }}"></dc-import>
+          </div>
+        </div>
+
+        <div style="position: absolute; left: 30px; right: 30px; top: 400px; display: flex; flex-direction: column; gap: 14px; align-items: center; text-align: center">
+          
+          <div style="font: 700 42px/1.1 'Fredoka',sans-serif; color: #FFF3E8; width: 309px; height: 60px">Connecte ta musique</div>
+        </div>
+
+        <div style="position:absolute;left:26px;right:26px;bottom:38px;display:flex;flex-direction:column;gap:16px;">
+          <div style="font: 600 21px/1.4 'Nunito',sans-serif; color: #C9B6D2; text-wrap: pretty; text-align: center">On pioche 5 titres secrets dans tes écoutes. Tes potes devront devenir devins.</div><div style="height:78px;border-radius:26px;background:#1DB954;display:flex;align-items:center;justify-content:center;gap:16px;box-shadow:0 8px 0 #148A3E;">
+            <div style="width:38px;height:38px;border-radius:50%;background:#06331A;display:flex;align-items:center;justify-content:center;"><div style="width:20px;height:20px;border-radius:50%;border:3px solid #1DB954;border-top-color:transparent;border-right-color:transparent;transform:rotate(-45deg);"></div></div>
+            <div style="font:700 26px 'Fredoka',sans-serif;color:#06331A;">Continuer avec Spotify</div>
+          </div>
+          <div style="height:66px;border-radius:24px;background:#1D1626;border:2px solid #2E2438;display:flex;align-items:center;justify-content:center;font:700 22px 'Fredoka',sans-serif;color:#C9B6D2;">Jouer sans ma musique</div><div style="text-align:center;font:600 16px 'Nunito',sans-serif;color:#8E7F92;">On lit tes titres. Rien d'autre, promis.</div>
+          
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div style="font:700 22px 'Fredoka',sans-serif;color:#FFF3E8;">3 · Ton perso <span style="font:600 18px 'Nunito',sans-serif;color:#8E7F92;">· cliquable</span></div>
+      <div style="position:relative;width:390px;height:844px;border-radius:52px;background:#100C16;border:9px solid #241A2E;overflow:hidden;box-shadow:0 26px 60px rgba(0,0,0,.6);">
+        <div style="position:absolute;inset:0;background:linear-gradient(to bottom,#241A2E 0%,#1A1322 42%,#120E18 100%);"></div>
+        <div style="position:absolute;left:0;right:0;top:16px;display:flex;justify-content:space-between;padding:0 30px;font:700 14px 'Nunito',sans-serif;color:#8E7F92;"><span>21:45</span><span>••• ▮</span></div>
+
+        <div style="position:absolute;left:0;right:0;top:48px;height:238px;overflow:hidden;">
+          <div style="position:absolute;left:50%;bottom:-24px;width:360px;height:140px;border-radius:50%;transform:translateX(-50%);background:radial-gradient(50% 50% at 50% 50%,rgba(255,179,77,.35),transparent 70%);animation:mpulse 1.3s infinite alternate ease-in-out;"></div>
+          <div style="position:absolute;left:0;right:0;bottom:12px;display:flex;justify-content:center;">
+            <dc-import name="Dancer" hint-size="130px,250px" skin="{{ skin }}" hair-color="{{ hairColor }}" hair="{{ hair }}" outfit="{{ outfit }}" pants="#2B2136" acc="{{ acc }}" dance="2" reaction="dance" scale="0.86" show-name="{{ false }}"></dc-import>
+          </div>
+          <div style="position:absolute;left:24px;top:8px;font:700 13px 'Nunito',sans-serif;letter-spacing:.24em;color:#F7A8B8;">FABRIQUE TON PERSO</div>
+        </div>
+
+        <div style="position:absolute;left:22px;right:22px;top:296px;display:flex;flex-direction:column;gap:15px;">
+          <div>
+            <div style="font:700 13px 'Nunito',sans-serif;letter-spacing:.2em;color:#8E7F92;margin-bottom:8px;">COIFFURE</div>
+            <div style="display:flex;gap:9px;">
+              <sc-for list="{{ hairOpts }}" as="o" hint-placeholder-count="7">
+                <div style="{{ o.tile }}" onClick="{{ o.on }}"><div style="{{ o.face }}"></div><div style="{{ o.shape }}"></div></div>
+              </sc-for>
+            </div>
+          </div>
+          <div>
+            <div style="font:700 13px 'Nunito',sans-serif;letter-spacing:.2em;color:#8E7F92;margin-bottom:8px;">PEAU</div>
+            <div style="display:flex;gap:10px;">
+              <sc-for list="{{ skinOpts }}" as="o" hint-placeholder-count="5">
+                <div style="{{ o.tile }}" onClick="{{ o.on }}"></div>
+              </sc-for>
+            </div>
+          </div>
+          <div>
+            <div style="font:700 13px 'Nunito',sans-serif;letter-spacing:.2em;color:#8E7F92;margin-bottom:8px;">TENUE</div>
+            <div style="display:flex;gap:10px;">
+              <sc-for list="{{ outfitOpts }}" as="o" hint-placeholder-count="5">
+                <div style="{{ o.tile }}" onClick="{{ o.on }}"></div>
+              </sc-for>
+            </div>
+          </div>
+          <div>
+            <div style="font:700 13px 'Nunito',sans-serif;letter-spacing:.2em;color:#8E7F92;margin-bottom:8px;">ACCESSOIRE</div>
+            <div style="display:flex;gap:9px;">
+              <sc-for list="{{ accOpts }}" as="o" hint-placeholder-count="5">
+                <div style="{{ o.tile }}" onClick="{{ o.on }}">{{ o.label }}</div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+        <div style="position:absolute;left:22px;right:22px;bottom:34px;display:flex;flex-direction:column;gap:14px;">
+          <div style="height:70px;border-radius:24px;background:#1D1626;border:2px solid #2E2438;display:flex;align-items:center;padding:0 22px;gap:14px;">
+            <div style="font:700 15px 'Nunito',sans-serif;color:#8E7F92;">NOM</div>
+            <input value="{{ name }}" onChange="{{ onName }}" placeholder="Marin" style="flex:1;background:transparent;border:none;outline:none;font:700 27px 'Fredoka',sans-serif;color:#FFF3E8;min-width:0;">
+          </div>
+          <div style="height:76px;border-radius:26px;background:#FFB34D;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 0 #C9832F;font:700 28px 'Fredoka',sans-serif;color:#452A05;">Je suis prêt !</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div style="font:700 22px 'Fredoka',sans-serif;color:#FFF3E8;">4 · Salle d'attente</div>
+      <div style="position:relative;width:390px;height:844px;border-radius:52px;background:#100C16;border:9px solid #241A2E;overflow:hidden;box-shadow:0 26px 60px rgba(0,0,0,.6);">
+        <div style="position:absolute;inset:0;background:radial-gradient(100% 60% at 50% 12%,#3B2749 0%,#1A1322 58%,#120E18 100%);"></div>
+        <div style="position:absolute;left:0;right:0;top:16px;display:flex;justify-content:space-between;padding:0 30px;font:700 14px 'Nunito',sans-serif;color:#8E7F92;"><span>21:47</span><span>••• ▮</span></div>
+        <sc-for list="{{ conf }}" as="p" hint-placeholder-count="8"><div style="{{ p.s }}"></div></sc-for>
+
+        <div style="position:absolute;left:26px;right:26px;top:74px;text-align:center;">
+          <div style="display:inline-flex;align-items:center;gap:10px;background:#1DB954;border-radius:999px;padding:9px 20px;"><div style="width:14px;height:14px;border-radius:50%;background:#06331A;"></div><div style="font:700 17px 'Fredoka',sans-serif;color:#06331A;">Perso validé</div></div>
+          <div style="font:700 44px/1.1 'Fredoka',sans-serif;color:#FFF3E8;margin-top:16px;">Salut Marin !</div>
+          <div style="font:600 20px 'Nunito',sans-serif;color:#C9B6D2;margin-top:8px;">Tu es sur la piste. Regarde la télé.</div>
+        </div>
+
+        <div style="position:absolute;left:0;right:0;top:300px;display:flex;justify-content:center;">
+          <div style="position:relative;display:flex;justify-content:center;width:230px;">
+            <div style="position:absolute;left:50%;bottom:-10px;width:250px;height:110px;border-radius:50%;transform:translateX(-50%);background:radial-gradient(50% 50% at 50% 50%,rgba(255,107,90,.34),transparent 70%);animation:mpulse 1.5s infinite alternate ease-in-out;"></div>
+            <dc-import name="Dancer" hint-size="122px,234px" skin="#8A5A3B" hair-color="#1C1519" hair="afro" outfit="#FFB34D" pants="#2B2136" acc="glasses" dance="1" reaction="dance" scale="0.92" show-name="{{ false }}"></dc-import>
+          </div>
+        </div>
+
+        <div style="position:absolute;left:24px;right:24px;bottom:150px;background:rgba(36,26,46,.8);border-radius:28px;padding:20px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><div style="font:700 14px 'Nunito',sans-serif;letter-spacing:.2em;color:#8E7F92;">SUR LA PISTE</div><div style="font:700 20px 'Fredoka',sans-serif;color:#FFB34D;">5 / 8</div></div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <sc-for list="{{ lobbyChars }}" as="c" hint-placeholder-count="5">
+              <div style="width:60px;height:96px;border-radius:18px;background:#1D1626;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:6px;overflow:hidden;">
+                <dc-import name="Dancer" hint-size="46px,88px" skin="{{ c.skin }}" hair-color="{{ c.hairColor }}" hair="{{ c.hair }}" outfit="{{ c.outfit }}" pants="{{ c.pants }}" acc="{{ c.acc }}" dance="{{ c.dance }}" delay="{{ c.delay }}" reaction="dance" scale="0.3" show-name="{{ false }}"></dc-import>
+                <div style="font:700 13px 'Fredoka',sans-serif;color:#C9B6D2;margin-top:4px;">{{ c.name }}</div>
+              </div>
+            </sc-for>
+            <div style="width:60px;height:96px;border-radius:18px;border:3px dashed #3A2E48;display:flex;align-items:center;justify-content:center;font:700 22px 'Fredoka',sans-serif;color:#5A4A66;">?</div>
+          </div>
+        </div>
+
+        <div style="position:absolute;left:0;right:0;bottom:56px;display:flex;flex-direction:column;align-items:center;gap:12px;">
+          <div style="font:700 21px 'Fredoka',sans-serif;color:#FFF3E8;">3 potes se dessinent encore</div>
+          <div style="display:flex;gap:8px;">
+            <div style="width:12px;height:12px;border-radius:50%;background:#FF6B5A;animation:mdots 1.2s infinite;"></div>
+            <div style="width:12px;height:12px;border-radius:50%;background:#FFB34D;animation:mdots 1.2s .2s infinite;"></div>
+            <div style="width:12px;height:12px;border-radius:50%;background:#F7A8B8;animation:mdots 1.2s .4s infinite;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div style="font:700 22px 'Fredoka',sans-serif;color:#FFF3E8;">5 · Vote <span style="font:600 18px 'Nunito',sans-serif;color:#8E7F92;">· cliquable</span></div>
+      <div style="position:relative;width:390px;height:844px;border-radius:52px;background:#100C16;border:9px solid #241A2E;overflow:hidden;box-shadow:0 26px 60px rgba(0,0,0,.6);">
+        <div style="position:absolute;inset:0;background:linear-gradient(to bottom,#1F1729 0%,#161020 60%,#120E18 100%);"></div>
+        <div style="position:absolute;left:0;right:0;top:16px;display:flex;justify-content:space-between;padding:0 30px;font:700 14px 'Nunito',sans-serif;color:#8E7F92;"><span>21:52</span><span>••• ▮</span></div>
+
+        <div style="position:absolute;left:22px;right:22px;top:50px;display:flex;align-items:center;gap:14px;">
+          <div style="flex:1;">
+            <div style="font:700 13px 'Nunito',sans-serif;letter-spacing:.2em;color:#F7A8B8;">ROUND 3 · ÇA JOUE SUR LA TÉLÉ</div>
+            <div style="font:700 30px/1.1 'Fredoka',sans-serif;color:#FFF3E8;margin-top:5px;">C'est le titre de qui ?</div>
+          </div>
+          <div style="width:58px;height:58px;border-radius:50%;background:conic-gradient(#FFB34D 0turn .62turn,rgba(255,243,232,.14) .62turn 1turn);display:flex;align-items:center;justify-content:center;flex:0 0 auto;">
+            <div style="width:44px;height:44px;border-radius:50%;background:#161020;display:flex;align-items:center;justify-content:center;font:700 20px 'Fredoka',sans-serif;color:#FFF3E8;">12</div>
+          </div>
+        </div>
+
+        <div style="position:absolute;left:22px;right:22px;top:152px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <sc-for list="{{ voteCards }}" as="c" hint-placeholder-count="8">
+            <div style="{{ c.card }}" onClick="{{ c.on }}">
+              <dc-import name="Dancer" hint-size="50px,96px" skin="{{ c.skin }}" hair-color="{{ c.hairColor }}" hair="{{ c.hair }}" outfit="{{ c.outfit }}" pants="{{ c.pants }}" acc="{{ c.acc }}" dance="{{ c.dance }}" delay="{{ c.delay }}" reaction="{{ c.reaction }}" scale="0.38" show-name="{{ false }}"></dc-import>
+              <div style="{{ c.pill }}">{{ c.name }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="position:absolute;left:22px;right:22px;bottom:34px;height:68px;border-radius:24px;background:{{ ctaBg }};display:flex;align-items:center;justify-content:center;font:700 24px 'Fredoka',sans-serif;color:{{ ctaFg }};">{{ ctaText }}</div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div style="font:700 22px 'Fredoka',sans-serif;color:#FFF3E8;">6 · Vote verrouillé</div>
+      <div style="position:relative;width:390px;height:844px;border-radius:52px;background:#100C16;border:9px solid #241A2E;overflow:hidden;box-shadow:0 26px 60px rgba(0,0,0,.6);">
+        <div style="position:absolute;inset:0;background:linear-gradient(to bottom,#1F1729 0%,#161020 60%,#120E18 100%);"></div>
+        <div style="position:absolute;left:0;right:0;top:16px;display:flex;justify-content:space-between;padding:0 30px;font:700 14px 'Nunito',sans-serif;color:#8E7F92;"><span>21:52</span><span>••• ▮</span></div>
+
+        <div style="position:absolute;left:22px;right:22px;top:50px;display:flex;align-items:center;gap:14px;">
+          <div style="flex:1;">
+            <div style="font:700 13px 'Nunito',sans-serif;letter-spacing:.2em;color:#FFB34D;">VOTE ENVOYÉ</div>
+            <div style="font:700 30px/1.1 'Fredoka',sans-serif;color:#FFF3E8;margin-top:5px;">Tu dis Salomé.</div>
+          </div>
+          <div style="width:58px;height:58px;border-radius:50%;background:conic-gradient(#FF6B5A 0turn .28turn,rgba(255,243,232,.14) .28turn 1turn);display:flex;align-items:center;justify-content:center;flex:0 0 auto;">
+            <div style="width:44px;height:44px;border-radius:50%;background:#161020;display:flex;align-items:center;justify-content:center;font:700 20px 'Fredoka',sans-serif;color:#FFF3E8;">6</div>
+          </div>
+        </div>
+
+        <div style="position:absolute;left:22px;right:22px;top:152px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <sc-for list="{{ lockedCards }}" as="c" hint-placeholder-count="8">
+            <div style="{{ c.card }}">
+              <dc-import name="Dancer" hint-size="50px,96px" skin="{{ c.skin }}" hair-color="{{ c.hairColor }}" hair="{{ c.hair }}" outfit="{{ c.outfit }}" pants="{{ c.pants }}" acc="{{ c.acc }}" dance="{{ c.dance }}" delay="{{ c.delay }}" reaction="{{ c.reaction }}" scale="0.38" show-name="{{ false }}"></dc-import>
+              <div style="{{ c.pill }}">{{ c.name }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="position:absolute;left:22px;right:22px;bottom:34px;display:flex;flex-direction:column;gap:12px;">
+          <div style="height:68px;border-radius:24px;background:#1D1626;border:2px solid #FF6B5A;display:flex;align-items:center;justify-content:center;font:700 23px 'Fredoka',sans-serif;color:#FF6B5A;">Changer d'avis</div>
+          <div style="text-align:center;font:600 17px 'Nunito',sans-serif;color:#8E7F92;">6 votes sur 8 · réponse sur la télé</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+const CHARS = [
+  {name:'Marin',  skin:'#8A5A3B', hairColor:'#1C1519', hair:'afro',     outfit:'#FFB34D', pants:'#2B2136', acc:'glasses',    dance:1, delay:'0s'},
+  {name:'Lila',   skin:'#F5CFA8', hairColor:'#F7A8B8', hair:'long',     outfit:'#4A3557', pants:'#E8553F', acc:'hoops',      dance:2, delay:'-.21s'},
+  {name:'Noé',    skin:'#C98B5E', hairColor:'#2B1D18', hair:'buzz',     outfit:'#FF6B5A', pants:'#2B2136', acc:'cap',        dance:3, delay:'-.43s'},
+  {name:'Salomé', skin:'#6E4227', hairColor:'#1C1519', hair:'bun',      outfit:'#FFF3E8', pants:'#4A3557', acc:'none',       dance:4, delay:'-.12s'},
+  {name:'Théo',   skin:'#F0C39A', hairColor:'#C9803A', hair:'curly',    outfit:'#E8553F', pants:'#2B2136', acc:'headphones', dance:5, delay:'-.34s'},
+  {name:'Ava',    skin:'#A9714A', hairColor:'#3A2A33', hair:'ponytail', outfit:'#F7A8B8', pants:'#2B2136', acc:'glasses',    dance:6, delay:'-.55s'},
+  {name:'Kenza',  skin:'#E0A97B', hairColor:'#1F1720', hair:'bob',      outfit:'#FFCE85', pants:'#4A3557', acc:'hoops',      dance:2, delay:'-.66s'},
+  {name:'Basile', skin:'#F7DCC0', hairColor:'#E6C28A', hair:'bob',      outfit:'#4A3557', pants:'#2B2136', acc:'cap',        dance:3, delay:'-.28s'}
+];
+const HAIRS = ['afro','long','buzz','bun','curly','ponytail','bob'];
+const SKINS = ['#F7DCC0','#F3C9A2','#C98B5E','#A9714A','#6E4227'];
+const OUTFITS = ['#FF6B5A','#FFB34D','#F7A8B8','#FFF3E8','#4A3557'];
+const ACCS = [['none','∅'],['glasses','Lun.'],['cap','Casq.'],['headphones','Casque'],['hoops','Boucles']];
+const MINI = {
+  afro:'left:5px;top:2px;width:38px;height:26px;border-radius:50%',
+  long:'left:7px;top:5px;width:34px;height:36px;border-radius:17px 17px 8px 8px',
+  buzz:'left:10px;top:7px;width:28px;height:12px;border-radius:9px 9px 2px 2px',
+  bun:'left:8px;top:4px;width:32px;height:20px;border-radius:16px 16px 4px 4px',
+  curly:'left:4px;top:3px;width:40px;height:24px;border-radius:50%',
+  ponytail:'left:8px;top:4px;width:32px;height:20px;border-radius:16px 16px 4px 4px',
+  bob:'left:7px;top:4px;width:34px;height:28px;border-radius:17px 17px 9px 9px'
+};
+
+class Component extends DCLogic {
+  state = { hair: 'afro', skin: '#8A5A3B', hairColor: '#1C1519', outfit: '#FFB34D', acc: 'glasses', name: 'Marin', vote: null };
+
+  card(sel) {
+    return `position:relative;box-sizing:border-box;height:124px;border-radius:20px;background:${sel ? '#33202A' : '#1D1626'};border:3px solid ${sel ? '#FF6B5A' : '#2A2135'};display:flex;align-items:flex-end;justify-content:center;padding-bottom:26px;overflow:hidden;cursor:pointer;box-shadow:${sel ? '0 0 0 4px rgba(255,107,90,.22)' : 'none'};${sel ? 'animation:mtap .5s infinite alternate ease-in-out;' : ''}`;
+  }
+  pill(sel) {
+    return `position:absolute;left:0;right:0;bottom:0;padding:5px 0;text-align:center;font:700 16px 'Fredoka',sans-serif;background:${sel ? '#FF6B5A' : '#241A2E'};color:${sel ? '#2A1E2B' : '#D6C7CF'};`;
+  }
+  cards(selName, interactive) {
+    return CHARS.map(c => {
+      const sel = c.name === selName;
+      const o = Object.assign({}, c, {
+        card: this.card(sel),
+        pill: this.pill(sel),
+        reaction: sel ? 'surprise' : 'dance'
+      });
+      if (interactive) o.on = () => this.setState({ vote: sel ? null : c.name });
+      return o;
+    });
+  }
+
+  renderVals() {
+    const s = this.state;
+    const swatch = (col, sel) => `width:52px;height:52px;border-radius:50%;background:${col};cursor:pointer;box-shadow:${sel ? '0 0 0 4px #FFB34D' : '0 0 0 2px #2E2438'};`;
+    return {
+      hair: s.hair, skin: s.skin, hairColor: s.hairColor, outfit: s.outfit, acc: s.acc, name: s.name,
+      onName: e => this.setState({ name: e.target.value }),
+      bgChars: [CHARS[1], CHARS[4], CHARS[6]],
+      lobbyChars: [CHARS[0], CHARS[1], CHARS[2], CHARS[4], CHARS[3]],
+      hairOpts: HAIRS.map(h => ({
+        on: () => this.setState({ hair: h }),
+        tile: `position:relative;width:46px;height:46px;border-radius:15px;background:#1D1626;cursor:pointer;flex:0 0 auto;box-shadow:${s.hair === h ? '0 0 0 3px #FF6B5A' : '0 0 0 2px #2E2438'};`,
+        face: `position:absolute;left:11px;top:11px;width:26px;height:28px;border-radius:50%;background:${s.skin};`,
+        shape: 'position:absolute;' + MINI[h] + `;background:${s.hairColor};`
+      })),
+      skinOpts: SKINS.map(c => ({ on: () => this.setState({ skin: c }), tile: swatch(c, s.skin === c) })),
+      outfitOpts: OUTFITS.map(c => ({ on: () => this.setState({ outfit: c }), tile: swatch(c, s.outfit === c) })),
+      accOpts: ACCS.map(a => ({
+        label: a[1],
+        on: () => this.setState({ acc: a[0] }),
+        tile: `height:46px;flex:1;border-radius:15px;background:#1D1626;display:flex;align-items:center;justify-content:center;font:700 14px 'Fredoka',sans-serif;color:${s.acc === a[0] ? '#FF6B5A' : '#C9B6D2'};cursor:pointer;box-shadow:${s.acc === a[0] ? '0 0 0 3px #FF6B5A' : '0 0 0 2px #2E2438'};`
+      })),
+      voteCards: this.cards(s.vote, true),
+      lockedCards: this.cards('Salomé', false),
+      ctaText: s.vote ? 'Envoyer : ' + s.vote : 'Tape sur un perso',
+      ctaBg: s.vote ? '#FFB34D' : '#1D1626',
+      ctaFg: s.vote ? '#452A05' : '#5A4A66',
+      conf: [0, 1, 2, 3, 4, 5, 6, 7].map(i => {
+        const col = ['#FF6B5A', '#FFB34D', '#F7A8B8', '#FFF3E8'][i % 4];
+        return { s: `position:absolute;top:-40px;left:${8 + i * 11}%;width:9px;height:${5 + (i % 3) * 4}px;border-radius:3px;background:${col};animation:mfall ${(3 + (i % 4) * .7).toFixed(1)}s ${(-i * .6).toFixed(1)}s infinite linear;` };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

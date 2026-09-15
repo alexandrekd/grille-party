@@ -1,0 +1,33 @@
+:root {
+  --coral: #ff6b5a;
+  --coral-dark: #c0483a;
+  --amber: #ffb34d;
+  --amber-dark: #452a05;
+  --pink: #f7a8b8;
+  --pink-text: #4a2029;
+  --pink-bright: #ffc7d3;
+  --cream: #fff3e8;
+  --plum: #4a3557;
+  --plum-light: #eadcef;
+  --night: #0e0a13;
+  --panel: #171220;
+  --ink: #2a1e2b;
+  --muted: #8e7f92;
+  --body-text: #d6c7cf;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--night);
+  font-family: "Nunito", system-ui, sans-serif;
+}
+
+#root {
+  min-height: 100%;
+}

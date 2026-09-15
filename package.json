@@ -1,0 +1,21 @@
+{
+  "name": "grille-party",
+  "private": true,
+  "version": "0.0.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n server,host,mobile -c blue,green,magenta \"npm run dev -w apps/server\" \"npm run dev -w apps/host\" \"npm run dev -w apps/mobile\"",
+    "dev:server": "npm run dev -w apps/server",
+    "dev:host": "npm run dev -w apps/host",
+    "dev:mobile": "npm run dev -w apps/mobile",
+    "typecheck": "tsc -b",
+    "test": "npm run test -w apps/server"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5",
+    "typescript": "5.9.3"
+  }
+}

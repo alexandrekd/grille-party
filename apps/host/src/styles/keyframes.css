@@ -1,0 +1,64 @@
+/* Ported verbatim from project/Grille - Identite visuelle.dc.html's <style> block. */
+@keyframes fall {
+  0% {
+    transform: translateY(-80px) rotate(0);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(760px) rotate(540deg);
+    opacity: 0.9;
+  }
+}
+@keyframes sway {
+  from {
+    transform: rotate(-7deg);
+  }
+  to {
+    transform: rotate(7deg);
+  }
+}
+@keyframes floorpulse {
+  from {
+    opacity: 0.45;
+    transform: translateX(-50%) scale(0.94);
+  }
+  to {
+    opacity: 0.85;
+    transform: translateX(-50%) scale(1.04);
+  }
+}
+@keyframes tilepulse {
+  from {
+    opacity: 0.25;
+  }
+  to {
+    opacity: 0.6;
+  }
+}
+@keyframes glowring {
+  from {
+    box-shadow: 0 0 0 0 rgba(255, 179, 77, 0.45);
+  }
+  to {
+    box-shadow: 0 0 0 26px rgba(255, 179, 77, 0);
+  }
+}
+@keyframes slotblink {
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 0.8;
+  }
+}
+@keyframes conepulse {
+  from {
+    opacity: 0.5;
+  }
+  to {
+    opacity: 0.9;
+  }
+}
