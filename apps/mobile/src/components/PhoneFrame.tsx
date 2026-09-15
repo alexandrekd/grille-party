@@ -1,46 +1,14 @@
-import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
-function useClock(): string {
-  const [now, setNow] = useState(() => new Date());
-  useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 15_000);
-    return () => clearInterval(id);
-  }, []);
-  return `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
-}
-
+/** Just a positioning canvas for the screens' absolutely-positioned layouts — the
+ * rounded bezel/border and fake clock+signal status bar were how the static design
+ * mockup showed "this is a phone screen" on a slide; they have no place in the
+ * actual shipped app, which already runs inside a real phone (with its own real
+ * status bar) or a real browser window. */
 export function PhoneFrame({ bg, children }: { bg: string; children: ReactNode }) {
-  const time = useClock();
   return (
-    <div
-      style={{
-        position: "relative",
-        width: 390,
-        height: 844,
-        borderRadius: 52,
-        background: "#100C16",
-        border: "9px solid #241A2E",
-        overflow: "hidden",
-        boxShadow: "0 26px 60px rgba(0,0,0,.6)",
-      }}
-    >
+    <div style={{ position: "relative", width: 390, height: 844, overflow: "hidden" }}>
       <div style={{ position: "absolute", inset: 0, background: bg }} />
-      <div
-        style={{
-          position: "absolute",
-          left: 0,
-          right: 0,
-          top: 16,
-          display: "flex",
-          justifyContent: "space-between",
-          padding: "0 30px",
-          font: "700 14px 'Nunito',sans-serif",
-          color: "#8E7F92",
-        }}
-      >
-        <span>{time}</span>
-        <span>••• ▮</span>
-      </div>
       {children}
     </div>
   );

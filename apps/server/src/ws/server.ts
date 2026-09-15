@@ -168,8 +168,15 @@ function handleMessage(
 
     case "player_start_game": {
       const room = roomForMeta(roomManager, meta);
-      if (!room || meta.role !== "player" || meta.playerId !== room.leaderPlayerId) return;
+      if (!room || meta.role !== "player") return;
+      if (meta.playerId !== room.leaderPlayerId) {
+        sendError(raw, "not_leader", "Seul le joueur principal peut lancer la partie.");
+        return;
+      }
       const started = room.startGame(msg.maxRounds, Date.now());
+      if (!started) {
+        sendError(raw, "start_failed", "La partie ne peut pas démarrer pour le moment.");
+      }
       broadcastRoomState(registry, room);
       if (started) {
         broadcastVoteProgress(registry, room);
@@ -180,7 +187,11 @@ function handleMessage(
 
     case "player_advance": {
       const room = roomForMeta(roomManager, meta);
-      if (!room || meta.role !== "player" || meta.playerId !== room.leaderPlayerId) return;
+      if (!room || meta.role !== "player") return;
+      if (meta.playerId !== room.leaderPlayerId) {
+        sendError(raw, "not_leader", "Seul le joueur principal peut passer.");
+        return;
+      }
       advancePhase(registry, room);
       return;
     }

@@ -97,7 +97,11 @@ export function useMobileSocket(): MobileView & { actions: MobileActions } {
           setMyVote(msg.votedForPlayerId);
           break;
         case "error":
-          setJoinError(msg.message);
+          // join_room failures show inline on JoinScreen; anything else (e.g. a
+          // non-leader's stray player_start_game/player_advance) has no dedicated
+          // UI yet, but at least isn't silent for whoever's debugging via devtools.
+          if (msg.code === "room_not_found") setJoinError(msg.message);
+          else console.error("[mobile] server error:", msg.code, msg.message);
           break;
         default:
           break;
