@@ -27,6 +27,9 @@ export function useHostSocket(): HostView & { actions: HostActions } {
   const wsRef = useRef<WebSocket | null>(null);
   const seqRef = useRef(0);
 
+  const connectRef = useRef<() => void>(() => {});
+  const suppressAutoReconnectRef = useRef(false);
+
   useEffect(() => {
     let cancelled = false;
     let reconnectTimer: ReturnType<typeof setTimeout> | undefined;
@@ -84,15 +87,48 @@ export function useHostSocket(): HostView & { actions: HostActions } {
 
       socket.addEventListener("close", () => {
         if (cancelled) return;
+        if (suppressAutoReconnectRef.current) {
+          // This close was triggered by connectRef.current() below, which is
+          // already reconnecting itself — don't also schedule a second one.
+          suppressAutoReconnectRef.current = false;
+          return;
+        }
         reconnectTimer = setTimeout(connect, RECONNECT_DELAY_MS);
       });
     }
+
+    connectRef.current = () => {
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+      if (wsRef.current && wsRef.current.readyState !== WebSocket.CLOSED) {
+        suppressAutoReconnectRef.current = true;
+        wsRef.current.close();
+      }
+      connect();
+    };
 
     connect();
     return () => {
       cancelled = true;
       if (reconnectTimer) clearTimeout(reconnectTimer);
       wsRef.current?.close();
+    };
+  }, []);
+
+  // A backgrounded tab can freeze its WebSocket without ever firing a "close"
+  // event — it just silently stops receiving frames. Force a fresh connection
+  // (which re-triggers the server's full resync) whenever this tab regains focus,
+  // instead of waiting on the reconnect timer or staying stuck on a stale phase.
+  useEffect(() => {
+    function resync() {
+      if (document.visibilityState === "visible") connectRef.current();
+    }
+    document.addEventListener("visibilitychange", resync);
+    window.addEventListener("focus", resync);
+    window.addEventListener("pageshow", resync);
+    return () => {
+      document.removeEventListener("visibilitychange", resync);
+      window.removeEventListener("focus", resync);
+      window.removeEventListener("pageshow", resync);
     };
   }, []);
 

@@ -57,11 +57,19 @@ export function useMobileSocket(): MobileView & { actions: MobileActions } {
 
   const wsRef = useRef<WebSocket | null>(null);
   const pendingJoinRef = useRef<{ roomCode: string; playerName?: string; rejoinToken?: string } | null>(null);
+  const suppressAutoReconnectRef = useRef(false);
 
-  const ensureSocket = useCallback((): WebSocket => {
+  const ensureSocket = useCallback((opts?: { force?: boolean }): WebSocket => {
     const existing = wsRef.current;
-    if (existing && (existing.readyState === WebSocket.OPEN || existing.readyState === WebSocket.CONNECTING)) {
+    if (!opts?.force && existing && (existing.readyState === WebSocket.OPEN || existing.readyState === WebSocket.CONNECTING)) {
       return existing;
+    }
+    if (opts?.force && existing && existing.readyState !== WebSocket.CLOSED) {
+      // A forced reconnect (e.g. tab regained visibility) below already opens a
+      // fresh socket — suppress the old one's own close-triggered reconnect so we
+      // don't end up scheduling a second, redundant one.
+      suppressAutoReconnectRef.current = true;
+      existing.close();
     }
     const socket = new WebSocket(`${serverWsBase()}/ws/player`);
     wsRef.current = socket;
@@ -110,6 +118,10 @@ export function useMobileSocket(): MobileView & { actions: MobileActions } {
     });
 
     socket.addEventListener("close", () => {
+      if (suppressAutoReconnectRef.current) {
+        suppressAutoReconnectRef.current = false;
+        return;
+      }
       if (pendingJoinRef.current) setTimeout(() => ensureSocket(), RECONNECT_DELAY_MS);
     });
 
@@ -127,6 +139,26 @@ export function useMobileSocket(): MobileView & { actions: MobileActions } {
     return () => {
       pendingJoinRef.current = null;
       wsRef.current?.close();
+    };
+  }, [ensureSocket]);
+
+  // A backgrounded/locked phone can freeze its WebSocket without ever firing a
+  // "close" event — the tab just silently stops receiving frames, so the player
+  // can be stuck on a stale phase until something wakes the JS event loop. Force a
+  // fresh connection (which re-triggers the server's full resync) whenever the
+  // player looks back at their phone, instead of waiting on the reconnect timer.
+  useEffect(() => {
+    function resync() {
+      if (document.visibilityState !== "visible" || !pendingJoinRef.current) return;
+      ensureSocket({ force: true });
+    }
+    document.addEventListener("visibilitychange", resync);
+    window.addEventListener("focus", resync);
+    window.addEventListener("pageshow", resync);
+    return () => {
+      document.removeEventListener("visibilitychange", resync);
+      window.removeEventListener("focus", resync);
+      window.removeEventListener("pageshow", resync);
     };
   }, [ensureSocket]);
 
