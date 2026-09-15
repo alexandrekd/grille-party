@@ -40,6 +40,19 @@ VITE_WS_URL=ws://192.168.1.42:8787 npm run dev
 
 (or create `apps/host/.env.local` / `apps/mobile/.env.local` with `VITE_WS_URL=ws://192.168.1.42:8787`). Then open `http://192.168.1.42:5174` on each phone.
 
+## Deploying (no local setup needed)
+
+`render.yaml` at the repo root is a [Render Blueprint](https://render.com/docs/blueprint-spec) that deploys all three services straight from this GitHub repo — no CLI, and it redeploys automatically on every push to `main`:
+
+1. Go to the [Render dashboard](https://dashboard.render.com) → **New +** → **Blueprint**
+2. Connect your GitHub account (or authorize just this repo) and pick `grille-party`
+3. Render reads `render.yaml` and proposes 3 free services: `grille-server` (the WebSocket backend), `grille-host` (TV screen), `grille-mobile` (phone controller) — click **Apply**
+4. Wait for all three to finish deploying (a few minutes). Open the `grille-host` service's URL for the TV screen, and the `grille-mobile` URL on your phone
+
+If `grille-server`'s auto-assigned URL isn't exactly `grille-server.onrender.com` (Render appends a suffix if that name was already taken), update the `VITE_WS_URL` environment variable on both `grille-host` and `grille-mobile` in the Render dashboard to match, then trigger a manual redeploy of those two.
+
+Render's free web services spin down after 15 minutes of inactivity and take ~30-60s to wake back up on the next request — fine for testing, not for an actual party.
+
 ## Testing
 
 ```

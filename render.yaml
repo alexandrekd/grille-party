@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: grille-server
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npx tsx apps/server/src/index.ts
+    envVars:
+      - key: NODE_VERSION
+        value: 22.0.0
+
+  - type: web
+    name: grille-host
+    env: static
+    buildCommand: npm install && npm run build -w apps/host
+    staticPublishPath: apps/host/dist
+    envVars:
+      - key: VITE_WS_URL
+        value: wss://grille-server.onrender.com
+
+  - type: web
+    name: grille-mobile
+    env: static
+    buildCommand: npm install && npm run build -w apps/mobile
+    staticPublishPath: apps/mobile/dist
+    envVars:
+      - key: VITE_WS_URL
+        value: wss://grille-server.onrender.com
