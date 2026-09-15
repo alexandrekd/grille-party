@@ -96,18 +96,37 @@ export function useSpotifyPlayback(roomCode: string | null, command: SpotifyComm
 
     void (async () => {
       const token = await fetchHostAccessToken(rc);
-      if (!token) return;
-      if (command.type === "play") {
-        await fetch(`${SPOTIFY_API}/me/player/play?device_id=${encodeURIComponent(deviceId)}`, {
+      if (!token) {
+        // The server has no Spotify session for this room anymore — most often
+        // because it restarted (tokens live in memory only, see the room's
+        // hostSpotifyTokens doc comment) since the host last connected. Reflect
+        // that honestly instead of silently doing nothing while still showing
+        // "Spotify connecté": the badge only appears in the Lobby, but flipping
+        // this now means it's accurate the next time that screen is visible.
+        console.error("[spotify] no host token available — Spotify session was lost, needs reconnecting");
+        setConnected(false);
+        return;
+      }
+      const url =
+        command.type === "play"
+          ? `${SPOTIFY_API}/me/player/play?device_id=${encodeURIComponent(deviceId)}`
+          : `${SPOTIFY_API}/me/player/pause`;
+      const body = command.type === "play" ? JSON.stringify({ uris: [command.trackUri] }) : undefined;
+      try {
+        const res = await fetch(url, {
           method: "PUT",
           headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
-          body: JSON.stringify({ uris: [command.trackUri] }),
-        }).catch((e: unknown) => console.error("[spotify] play failed", e));
-      } else {
-        await fetch(`${SPOTIFY_API}/me/player/pause`, {
-          method: "PUT",
-          headers: { authorization: `Bearer ${token}` },
-        }).catch((e: unknown) => console.error("[spotify] pause failed", e));
+          body,
+        });
+        if (!res.ok) {
+          // fetch() only rejects on a network failure, never on a non-2xx status —
+          // without this check, a real Spotify API error (e.g. "no active device"
+          // after the SDK silently reconnected with a new one) was invisible.
+          console.error(`[spotify] ${command.type} failed`, res.status, await res.text().catch(() => ""));
+          if (res.status === 401 || res.status === 403) setConnected(false);
+        }
+      } catch (e) {
+        console.error(`[spotify] ${command.type} threw`, e);
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps

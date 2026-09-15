@@ -21,7 +21,12 @@ export function App() {
     }
   }, []);
 
-  return <Stage>{roomState ? renderScreen() : <ConnectingScreen />}</Stage>;
+  return (
+    <>
+      <Stage>{roomState ? renderScreen() : <ConnectingScreen />}</Stage>
+      {roomState && roomState.phase !== "LOBBY" && !spotifyConnected && <SpotifyLostIndicator />}
+    </>
+  );
 
   function renderScreen() {
     if (!roomState) return null;
@@ -77,6 +82,33 @@ export function App() {
         return null;
     }
   }
+}
+
+/** Read-only — the TV has no clickable controls outside the Lobby, this is purely
+ * a signal that the host needs to reconnect Spotify from there before the next
+ * round, since a play/stop command silently going nowhere is otherwise invisible
+ * mid-game (see useSpotifyPlayback's token-loss handling). */
+function SpotifyLostIndicator() {
+  return (
+    <div
+      style={{
+        position: "fixed",
+        left: 16,
+        bottom: 16,
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        background: "rgba(36,26,46,.9)",
+        border: "2px solid #FF6B5A",
+        borderRadius: 999,
+        padding: "8px 16px",
+        font: "700 13px 'Nunito',sans-serif",
+        color: "#FF6B5A",
+      }}
+    >
+      🔇 Spotify déconnecté — à reconnecter depuis le lobby
+    </div>
+  );
 }
 
 function ConnectingScreen() {
