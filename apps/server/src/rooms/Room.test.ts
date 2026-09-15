@@ -15,6 +15,7 @@ function fakeSpotify(): SpotifyProvider {
         title: `Track ${base}-${i}`,
         artist: "Fixture",
         coverUrl: "#000",
+        durationMs: 20_000,
       }));
     },
   };
@@ -50,6 +51,15 @@ describe("Room lobby", () => {
     expect(room.findByRejoinToken(a.rejoinToken)?.id).toBe(a.id);
     expect(room.findByRejoinToken("nope")).toBeNull();
   });
+
+  it("makes the first player to join the room's leader, and only that player", () => {
+    const room = new Room("1234", fakeSpotify());
+    const a = room.addPlayer("A");
+    const b = room.addPlayer("B");
+    expect(room.leaderPlayerId).toBe(a.id);
+    expect(room.publicPlayers.find((p) => p.id === a.id)?.isLeader).toBe(true);
+    expect(room.publicPlayers.find((p) => p.id === b.id)?.isLeader).toBe(false);
+  });
 });
 
 describe("Room round loop — happy path", () => {
@@ -71,13 +81,10 @@ describe("Room round loop — happy path", () => {
     expect(round1.resolved).toBe(true);
     const ownerDelta = round1.scoreDeltas!.find((d) => d.reason === "self_correct");
     expect(ownerDelta?.playerId).toBe(owner);
-    for (const p of others) {
-      expect(round1.scoreDeltas).toContainEqual({
-        playerId: p.id,
-        delta: 10,
-        reason: "correct_guess",
-      });
-    }
+    // Ranked by submission order — the loop above voted in `players` order, so the
+    // two non-owner voters score 10 (1st correct) then 8 (2nd correct).
+    expect(round1.scoreDeltas).toContainEqual({ playerId: others[0]!.id, delta: 10, reason: "correct_guess" });
+    expect(round1.scoreDeltas).toContainEqual({ playerId: others[1]!.id, delta: 8, reason: "correct_guess" });
 
     expect(room.advanceFromReveal(Date.now())).toBe(true);
     expect(room.phase).toBe("LEADERBOARD");
@@ -86,6 +93,32 @@ describe("Room round loop — happy path", () => {
     expect(room.phase).toBe("VOTING");
     expect(room.currentRoundIndex).toBe(1);
     expect(room.currentRound!.id).not.toBe(round1.id);
+  });
+
+  it("sizes the voting window to the round's track duration, floored at a minimum", () => {
+    const longTrack: SpotifyProvider = {
+      getTopTracksForPlayer: () => [
+        { id: "long", title: "Long", artist: "Fixture", coverUrl: "#000", durationMs: 45_000 },
+      ],
+    };
+    const room = new Room("1234", longTrack);
+    const players = Array.from({ length: 2 }, (_, i) => room.addPlayer(`P${i}`));
+    for (const p of players) room.submitTraits(p.id, DEFAULT_TRAITS, p.name);
+    room.startGame(8, 0);
+    expect(room.currentRound!.totalVoteMs).toBe(45_000);
+    expect(room.currentRound!.votingDeadlineTs).toBe(45_000);
+
+    const shortTrack: SpotifyProvider = {
+      getTopTracksForPlayer: () => [
+        { id: "short", title: "Short", artist: "Fixture", coverUrl: "#000", durationMs: 3_000 },
+      ],
+    };
+    const room2 = new Room("5678", shortTrack);
+    const players2 = Array.from({ length: 2 }, (_, i) => room2.addPlayer(`P${i}`));
+    for (const p of players2) room2.submitTraits(p.id, DEFAULT_TRAITS, p.name);
+    room2.startGame(8, 0);
+    // A very short track still gets at least MIN_VOTE_WINDOW_MS, not cut to 3s.
+    expect(room2.currentRound!.totalVoteMs).toBe(15_000);
   });
 
   it("does not resolve a round until every player has voted", () => {
@@ -184,7 +217,7 @@ describe("Room public views never expose individual votes", () => {
     const round = room.currentRound!;
     room.submitVote(players[0]!.id, round.id, round.ownerPlayerId, 10);
     const info = room.roundPublicInfo!;
-    expect(Object.keys(info).sort()).toEqual(["roundId", "roundIndex", "votingDeadlineTs"]);
+    expect(Object.keys(info).sort()).toEqual(["roundId", "roundIndex", "totalVoteMs", "votingDeadlineTs"]);
   });
 
   it("voteProgress is aggregate-only", () => {

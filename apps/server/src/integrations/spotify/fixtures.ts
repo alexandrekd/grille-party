@@ -1,11 +1,15 @@
+import { FALLBACK_TRACK_DURATION_MS } from "@grille/shared";
 import type { StubTrack } from "./types.js";
 
 /**
- * Fake "top tracks" fixture pool, standing in for real Spotify data during the MVP
- * (no OAuth/Web Playback SDK wired yet — see ./stub.ts). Titles are invented, not
- * real songs. Sized for up to 8 players x 5 tracks each with room to spare.
+ * Fake "top tracks" fixture pool, standing in for real Spotify data whenever a
+ * player skips/never finishes Spotify OAuth (see ./stub.ts). Titles are invented,
+ * not real songs, so there's no real duration either — every fixture track gets the
+ * same fallback duration, sized for up to 8 players x 5 tracks each with room to
+ * spare.
  */
-export const FIXTURE_TRACKS: StubTrack[] = [
+export const FIXTURE_TRACKS: StubTrack[] = (
+  [
   { id: "t01", title: "Nuit Corail", artist: "Les Voisins du Dessus", coverUrl: "#FF6B5A" },
   { id: "t02", title: "Tempo Ambre", artist: "Salomé & les Spots", coverUrl: "#FFB34D" },
   { id: "t03", title: "Rose Poudré", artist: "Kenza B.", coverUrl: "#F7A8B8" },
@@ -46,6 +50,7 @@ export const FIXTURE_TRACKS: StubTrack[] = [
   { id: "t38", title: "Après le Générique", artist: "DJ Prune", coverUrl: "#F7A8B8" },
   { id: "t39", title: "Salle Assombrie", artist: "Salomé & les Spots", coverUrl: "#4A3557" },
   { id: "t40", title: "Le Titre de Qui ?", artist: "Kenza B.", coverUrl: "#FFF3E8" },
-];
+  ] satisfies Omit<StubTrack, "durationMs">[]
+).map((t) => ({ ...t, durationMs: FALLBACK_TRACK_DURATION_MS }));
 
 export const FIXTURE_PARTITION_SIZE = 5;

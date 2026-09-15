@@ -75,6 +75,7 @@ export function toPublicPlayer(c: CharFixture, overrides: Partial<PublicPlayerSu
     traits: c.traits,
     score: c.score,
     connected: true,
+    isLeader: false,
     ...overrides,
   };
 }

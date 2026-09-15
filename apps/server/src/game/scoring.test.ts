@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { applyScoreDeltas, computeRoundScoring } from "./scoring.js";
 
 describe("computeRoundScoring", () => {
-  it("awards +10 to each non-owner voter who guessed correctly", () => {
+  it("ranks correct guesses by submission order: 1st scores more than 2nd", () => {
     const deltas = computeRoundScoring({
       ownerPlayerId: "owner",
       allPlayerIds: ["owner", "a", "b"],
@@ -13,7 +13,26 @@ describe("computeRoundScoring", () => {
       ]),
     });
     expect(deltas).toContainEqual({ playerId: "a", delta: 10, reason: "correct_guess" });
-    expect(deltas).toContainEqual({ playerId: "b", delta: 10, reason: "correct_guess" });
+    expect(deltas).toContainEqual({ playerId: "b", delta: 8, reason: "correct_guess" });
+  });
+
+  it("floors the correct-guess rank bonus instead of going to 0 or negative", () => {
+    const deltas = computeRoundScoring({
+      ownerPlayerId: "owner",
+      allPlayerIds: ["owner", "a", "b", "c", "d", "e", "f"],
+      votes: new Map([
+        ["a", "owner"],
+        ["b", "owner"],
+        ["c", "owner"],
+        ["d", "owner"],
+        ["e", "owner"],
+        ["f", "owner"],
+        ["owner", "owner"],
+      ]),
+    });
+    // ranks 1-5: 10, 8, 6, 4, 2 ; rank 6 floors at 2 instead of 0.
+    expect(deltas).toContainEqual({ playerId: "e", delta: 2, reason: "correct_guess" });
+    expect(deltas).toContainEqual({ playerId: "f", delta: 2, reason: "correct_guess" });
   });
 
   it("gives 0 to a non-owner voter who guessed wrong", () => {
@@ -120,7 +139,7 @@ describe("computeRoundScoring", () => {
       deltas.map((d) => [d.playerId + ":" + d.reason, d.delta]),
     );
     expect(byPlayer["marin:correct_guess"]).toBe(10);
-    expect(byPlayer["ava:correct_guess"]).toBe(10);
+    expect(byPlayer["ava:correct_guess"]).toBe(8);
     expect(byPlayer["theo:wrong_guess"]).toBe(0);
     expect(byPlayer["kenza:wrong_guess"]).toBe(0);
     expect(byPlayer["salome:self_correct"]).toBe(0);

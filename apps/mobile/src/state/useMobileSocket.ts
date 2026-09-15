@@ -32,6 +32,10 @@ export interface MobileActions {
   join: (roomCode: string, playerName?: string) => void;
   submitTraits: (traits: DancerTraits, name: string) => void;
   submitVote: (roundId: string, votedForPlayerId: string) => void;
+  /** Leader-only (see PublicPlayerSummary.isLeader) — the server silently ignores
+   * these from anyone else. */
+  startGame: (maxRounds?: number) => void;
+  advance: () => void;
 }
 
 /**
@@ -140,6 +144,14 @@ export function useMobileSocket(): MobileView & { actions: MobileActions } {
     wsRef.current?.send(encodeMessage({ type: "submit_vote", roundId, votedForPlayerId }));
   }, []);
 
+  const startGame = useCallback((maxRounds?: number) => {
+    wsRef.current?.send(encodeMessage({ type: "player_start_game", maxRounds }));
+  }, []);
+
+  const advance = useCallback(() => {
+    wsRef.current?.send(encodeMessage({ type: "player_advance" }));
+  }, []);
+
   return {
     roomState,
     voteProgress,
@@ -148,6 +160,6 @@ export function useMobileSocket(): MobileView & { actions: MobileActions } {
     myPlayerId,
     myVote,
     joinError,
-    actions: { join, submitTraits, submitVote },
+    actions: { join, submitTraits, submitVote, startGame, advance },
   };
 }

@@ -166,6 +166,25 @@ function handleMessage(
       return;
     }
 
+    case "player_start_game": {
+      const room = roomForMeta(roomManager, meta);
+      if (!room || meta.role !== "player" || meta.playerId !== room.leaderPlayerId) return;
+      const started = room.startGame(msg.maxRounds, Date.now());
+      broadcastRoomState(registry, room);
+      if (started) {
+        broadcastVoteProgress(registry, room);
+        playCurrentRound(registry, room);
+      }
+      return;
+    }
+
+    case "player_advance": {
+      const room = roomForMeta(roomManager, meta);
+      if (!room || meta.role !== "player" || meta.playerId !== room.leaderPlayerId) return;
+      advancePhase(registry, room);
+      return;
+    }
+
     case "submit_vote": {
       const room = roomForMeta(roomManager, meta);
       if (!room || meta.role !== "player" || !meta.playerId) return;

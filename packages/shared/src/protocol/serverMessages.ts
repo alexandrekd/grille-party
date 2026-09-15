@@ -26,6 +26,10 @@ export interface RoundPublicInfo {
   roundId: string;
   roundIndex: number;
   votingDeadlineTs: number;
+  /** The full voting window in ms (the track's own duration — see
+   * Room.startNextRound) — clients derive the countdown ring's fraction from this
+   * rather than a shared constant, since it now varies per round. */
+  totalVoteMs: number;
 }
 
 /**

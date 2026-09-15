@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import { Dancer } from "@grille/characters";
 import type { PublicPlayerSummary } from "@grille/shared";
-import { VOTE_WINDOW_MS } from "@grille/shared";
 import { Dancefloor, FloorGrid, GlowSpot, Halo, Particles } from "../components/Dancefloor.js";
 import { CountdownRing } from "../components/CountdownRing.js";
 import { confettiParticles } from "../lib/confetti.js";
@@ -12,6 +11,7 @@ export function RoundScreen({
   roundIndex,
   maxRounds,
   votingDeadlineTs,
+  totalVoteMs,
   votesReceived,
   votesExpected,
 }: {
@@ -19,6 +19,7 @@ export function RoundScreen({
   roundIndex: number;
   maxRounds: number;
   votingDeadlineTs: number;
+  totalVoteMs: number;
   votesReceived: number;
   votesExpected: number;
 }) {
@@ -79,7 +80,7 @@ export function RoundScreen({
       </div>
 
       <div style={{ position: "absolute", right: 56, top: 52 }}>
-        <CountdownRing deadlineTs={votingDeadlineTs} totalMs={VOTE_WINDOW_MS} />
+        <CountdownRing deadlineTs={votingDeadlineTs} totalMs={totalVoteMs} />
       </div>
 
       <div style={{ position: "absolute", left: 0, right: 0, bottom: 326, display: "flex", justifyContent: "center", alignItems: "flex-end", gap: 66 }}>

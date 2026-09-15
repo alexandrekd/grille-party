@@ -88,6 +88,7 @@ interface SpotifyTrackItem {
   name: string;
   artists: { name: string }[];
   album: { images: { url: string }[] };
+  duration_ms: number;
 }
 
 /** Player's real top tracks — `/me/top/tracks`, not an algorithmic playlist (those
@@ -106,6 +107,7 @@ export async function fetchTopTracks(accessToken: string, limit = 10): Promise<S
     title: t.name,
     artist: t.artists.map((a) => a.name).join(", "),
     coverUrl: t.album.images[0]?.url ?? "",
+    durationMs: t.duration_ms,
   }));
 }
 

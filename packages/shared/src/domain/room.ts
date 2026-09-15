@@ -20,6 +20,9 @@ export interface PublicPlayerSummary {
   traits: DancerTraits | null;
   score: number;
   connected: boolean;
+  /** The first player to join controls the game from their phone (start, skip) —
+   * the TV has no clickable controls. */
+  isLeader: boolean;
 }
 
 export interface ScoreDelta {

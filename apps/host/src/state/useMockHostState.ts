@@ -6,7 +6,9 @@ import type {
   RoundResolvedMessage,
   VoteProgressMessage,
 } from "@grille/shared";
-import { DEFAULT_MAX_ROUNDS, VOTE_WINDOW_MS } from "@grille/shared";
+import { DEFAULT_MAX_ROUNDS } from "@grille/shared";
+
+const MOCK_TOTAL_VOTE_MS = 20_000;
 import { CHAR_FIXTURES, byId, toPublicPlayer } from "./fixtures.js";
 import type { HostActions, HostView } from "./types.js";
 
@@ -38,10 +40,10 @@ export function useMockHostState(): HostView & {
   devSetScene: (scene: Scene) => void;
 } {
   const [scene, setScene] = useState<Scene>("LOBBY");
-  const [deadline, setDeadline] = useState(() => Date.now() + VOTE_WINDOW_MS);
+  const [deadline, setDeadline] = useState(() => Date.now() + MOCK_TOTAL_VOTE_MS);
 
   const startGame = useCallback(() => {
-    setDeadline(Date.now() + VOTE_WINDOW_MS);
+    setDeadline(Date.now() + MOCK_TOTAL_VOTE_MS);
     setScene("VOTING");
   }, []);
 
@@ -81,7 +83,7 @@ export function useMockHostState(): HostView & {
         ...roomStateBase,
         phase: "VOTING",
         players: allPlayers(),
-        round: { roundId, roundIndex: ROUND_INDEX, votingDeadlineTs: deadline },
+        round: { roundId, roundIndex: ROUND_INDEX, votingDeadlineTs: deadline, totalVoteMs: MOCK_TOTAL_VOTE_MS },
         allReady: true,
       };
       const voteProgress: VoteProgressMessage = {
@@ -99,7 +101,7 @@ export function useMockHostState(): HostView & {
         ...roomStateBase,
         phase: "REVEAL",
         players: allPlayers(),
-        round: { roundId: "round-3", roundIndex: ROUND_INDEX, votingDeadlineTs: deadline },
+        round: { roundId: "round-3", roundIndex: ROUND_INDEX, votingDeadlineTs: deadline, totalVoteMs: MOCK_TOTAL_VOTE_MS },
         allReady: true,
       };
       const roundResolved: RoundResolvedMessage = {

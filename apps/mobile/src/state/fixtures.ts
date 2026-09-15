@@ -20,5 +20,5 @@ export const CHAR_FIXTURES: CharFixture[] = [
 ];
 
 export function toPublicPlayer(c: CharFixture, overrides: Partial<PublicPlayerSummary> = {}): PublicPlayerSummary {
-  return { id: c.id, name: c.name, status: "READY", traits: c.traits, score: 0, connected: true, ...overrides };
+  return { id: c.id, name: c.name, status: "READY", traits: c.traits, score: 0, connected: true, isLeader: false, ...overrides };
 }

@@ -1,6 +1,6 @@
 import {
   DEFAULT_MAX_ROUNDS,
-  VOTE_WINDOW_MS,
+  MIN_VOTE_WINDOW_MS,
   validateTraits,
   type DancerTraits,
   type PlayerStatus,
@@ -34,6 +34,7 @@ export interface RoundRecord {
   ownerPlayerId: string;
   track: StubTrack;
   votingDeadlineTs: number;
+  totalVoteMs: number;
   votes: Map<string, string>;
   resolved: boolean;
   resolvedAt: number | null;
@@ -45,6 +46,7 @@ export interface RoundPublicView {
   roundId: string;
   roundIndex: number;
   votingDeadlineTs: number;
+  totalVoteMs: number;
 }
 
 /**
@@ -66,6 +68,11 @@ export class Room {
    * internal timers. */
   phaseEnteredAt = Date.now();
   hostConnectionId: string | null = null;
+  /** The first player to join controls the game from their phone (start, skip
+   * REVEAL/LEADERBOARD) — the TV has no clickable controls. Fixed once assigned,
+   * even if that player later disconnects (same no-reassignment stance as the host
+   * connection — a known limitation, not something to fix for the MVP). */
+  leaderPlayerId: string | null = null;
   /** The host's Spotify Premium tokens (Web Playback SDK), one session per room —
    * set by the host OAuth callback route, read/refreshed by the `/spotify/host/token`
    * route the SDK polls. `null` means the host hasn't connected Spotify (or skipped
@@ -106,6 +113,7 @@ export class Room {
       topTracks: [],
     };
     this.players.set(id, player);
+    if (this.leaderPlayerId === null) this.leaderPlayerId = id;
     return player;
   }
 
@@ -183,12 +191,16 @@ export class Room {
       return false;
     }
     this.currentRoundIndex += 1;
+    // The round runs for the track's own length — no one is cut off before the
+    // song ends, only a floor in case a track's real duration is unusually short.
+    const totalVoteMs = Math.max(pooled.track.durationMs, MIN_VOTE_WINDOW_MS);
     this.rounds.push({
       id: newId(),
       index: this.currentRoundIndex,
       ownerPlayerId: pooled.ownerPlayerId,
       track: pooled.track,
-      votingDeadlineTs: now + VOTE_WINDOW_MS,
+      votingDeadlineTs: now + totalVoteMs,
+      totalVoteMs,
       votes: new Map(),
       resolved: false,
       resolvedAt: null,
@@ -277,13 +289,14 @@ export class Room {
       traits: p.traits,
       score: p.score,
       connected: p.connectionId !== null,
+      isLeader: p.id === this.leaderPlayerId,
     }));
   }
 
   get roundPublicInfo(): RoundPublicView | null {
     const r = this.currentRound;
     if (!r) return null;
-    return { roundId: r.id, roundIndex: r.index, votingDeadlineTs: r.votingDeadlineTs };
+    return { roundId: r.id, roundIndex: r.index, votingDeadlineTs: r.votingDeadlineTs, totalVoteMs: r.totalVoteMs };
   }
 
   resolvedVotesFor(round: RoundRecord): ResolvedVote[] {

@@ -9,20 +9,19 @@ export function LobbyScreen({
   roomCode,
   players,
   allReady,
-  onStart,
   spotifyConnected,
   onConnectSpotify,
 }: {
   roomCode: string;
   players: PublicPlayerSummary[];
   allReady: boolean;
-  onStart: () => void;
   spotifyConnected: boolean;
   onConnectSpotify: () => void;
 }) {
   const ready = players.filter((p) => p.status === "READY" && p.traits);
   const openSlots = Math.max(0, MAX_SLOTS - ready.length);
   const lastJoined = ready[ready.length - 1];
+  const leader = players.find((p) => p.isLeader);
 
   return (
     <Dancefloor bg="radial-gradient(120% 95% at 50% 105%,#3B2749 0%,#1C1526 58%,#14101C 100%)">
@@ -64,22 +63,30 @@ export function LobbyScreen({
           </div>
         </div>
 
-        {allReady && (
-          <button
-            onClick={onStart}
+        {leader && (
+          <div
             style={{
-              border: "none",
-              cursor: "pointer",
-              font: "700 22px 'Fredoka',sans-serif",
-              color: "#452A05",
-              background: "#FFB34D",
-              padding: "14px 30px",
+              display: "flex",
+              gap: 10,
+              alignItems: "center",
+              background: "rgba(36,26,46,.85)",
               borderRadius: 999,
-              boxShadow: "0 8px 0 #C9832F",
+              padding: "12px 24px",
             }}
           >
-            Lancer la partie
-          </button>
+            <div
+              style={{
+                width: 10,
+                height: 10,
+                borderRadius: "50%",
+                background: "#FFB34D",
+                animation: allReady ? "slotblink 1.2s infinite alternate" : undefined,
+              }}
+            />
+            <div style={{ font: "700 17px 'Fredoka',sans-serif", color: "#FFF3E8" }}>
+              {allReady ? `${leader.name} peut lancer la partie sur son téléphone` : `${leader.name} est le joueur principal`}
+            </div>
+          </div>
         )}
 
         {spotifyConnected ? (

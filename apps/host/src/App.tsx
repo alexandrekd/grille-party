@@ -9,7 +9,7 @@ import { RevealScreen } from "./screens/RevealScreen.js";
 import { LeaderboardScreen } from "./screens/LeaderboardScreen.js";
 
 export function App() {
-  const { roomState, voteProgress, roundResolved, leaderboard, spotifyCommand, actions } = useHostSocket();
+  const { roomState, voteProgress, roundResolved, leaderboard, spotifyCommand } = useHostSocket();
   const { connected: spotifyConnected } = useSpotifyPlayback(roomState?.roomCode ?? null, spotifyCommand);
 
   // The host OAuth callback redirects back here with ?spotify=ok|error — nothing to
@@ -21,14 +21,7 @@ export function App() {
     }
   }, []);
 
-  return (
-    <>
-      <Stage>{roomState ? renderScreen() : <ConnectingScreen />}</Stage>
-      {(roomState?.phase === "REVEAL" || roomState?.phase === "LEADERBOARD") && (
-        <AdvanceButton onClick={actions.advance} />
-      )}
-    </>
-  );
+  return <Stage>{roomState ? renderScreen() : <ConnectingScreen />}</Stage>;
 
   function renderScreen() {
     if (!roomState) return null;
@@ -39,7 +32,6 @@ export function App() {
             roomCode={roomState.roomCode}
             players={roomState.players}
             allReady={roomState.allReady}
-            onStart={() => actions.startGame()}
             spotifyConnected={spotifyConnected}
             onConnectSpotify={() => {
               window.location.href = `${serverHttpBase()}/spotify/host/login?roomCode=${encodeURIComponent(roomState.roomCode)}`;
@@ -53,6 +45,7 @@ export function App() {
             roundIndex={roomState.round.roundIndex}
             maxRounds={roomState.maxRounds}
             votingDeadlineTs={roomState.round.votingDeadlineTs}
+            totalVoteMs={roomState.round.totalVoteMs}
             votesReceived={voteProgress?.votesReceived ?? 0}
             votesExpected={voteProgress?.votesExpected ?? roomState.players.length}
           />
@@ -101,29 +94,5 @@ function ConnectingScreen() {
     >
       Connexion à la partie…
     </div>
-  );
-}
-
-/** REVEAL/LEADERBOARD also auto-advance after a fixed display duration (server
- * timer) — this lets the host skip ahead sooner, per the protocol's `host_advance`. */
-function AdvanceButton({ onClick }: { onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        position: "fixed",
-        right: 16,
-        bottom: 16,
-        font: "700 14px 'Nunito',sans-serif",
-        padding: "8px 16px",
-        borderRadius: 999,
-        border: "none",
-        cursor: "pointer",
-        background: "#241A2E",
-        color: "#FFF3E8",
-      }}
-    >
-      Continuer →
-    </button>
   );
 }

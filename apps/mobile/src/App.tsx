@@ -17,6 +17,7 @@ import { JoinScreen } from "./screens/JoinScreen.js";
 import { SpotifyConnectScreen } from "./screens/SpotifyConnectScreen.js";
 import { CharacterEditorScreen } from "./screens/CharacterEditorScreen.js";
 import { WaitingRoomScreen } from "./screens/WaitingRoomScreen.js";
+import { LeaderLobbyScreen } from "./screens/LeaderLobbyScreen.js";
 import { VoteScreen } from "./screens/VoteScreen.js";
 import { RoundResultScreen } from "./screens/RoundResultScreen.js";
 import { MobileLeaderboardScreen } from "./screens/MobileLeaderboardScreen.js";
@@ -114,7 +115,12 @@ export function App() {
   }, [roundResolved, myPlayerId, roomState, me, draftTraits, name]);
 
   return (
-    <Stage>{renderScreen()}</Stage>
+    <>
+      <Stage>{renderScreen()}</Stage>
+      {me?.isLeader && (roomState?.phase === "REVEAL" || roomState?.phase === "LEADERBOARD") && (
+        <SkipButton onClick={actions.advance} />
+      )}
+    </>
   );
 
   function renderScreen() {
@@ -150,7 +156,15 @@ export function App() {
 
     switch (roomState?.phase) {
       case "LOBBY":
-        return (
+        return me.isLeader ? (
+          <LeaderLobbyScreen
+            name={me.name}
+            traits={me.traits!}
+            lobbyChars={roomState.players.filter((p) => p.id !== myPlayerId)}
+            allReady={roomState.allReady}
+            onStart={(maxRounds) => actions.startGame(maxRounds)}
+          />
+        ) : (
           <WaitingRoomScreen
             name={me.name}
             traits={me.traits!}
@@ -169,6 +183,7 @@ export function App() {
             }}
             locked={voteLocked}
             votingDeadlineTs={roomState.round.votingDeadlineTs}
+            totalVoteMs={roomState.round.totalVoteMs}
             votesReceived={voteProgress?.votesReceived ?? 0}
             votesExpected={voteProgress?.votesExpected ?? roomState.players.length}
             roundIndex={roomState.round.roundIndex}
@@ -199,4 +214,30 @@ export function App() {
         );
     }
   }
+}
+
+/** REVEAL/LEADERBOARD also auto-advance after a fixed display duration (server
+ * timer) — this lets the leader skip ahead sooner, the only manual game control
+ * left now that the TV has no clickable buttons. */
+function SkipButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        position: "fixed",
+        right: 16,
+        bottom: 16,
+        font: "700 14px 'Nunito',sans-serif",
+        padding: "10px 18px",
+        borderRadius: 999,
+        border: "none",
+        cursor: "pointer",
+        background: "#FFB34D",
+        color: "#452A05",
+        boxShadow: "0 5px 0 #C9832F",
+      }}
+    >
+      Passer →
+    </button>
+  );
 }

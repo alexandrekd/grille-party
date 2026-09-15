@@ -6,9 +6,10 @@ import {
   OUTFIT_SWATCHES,
   ACCESSORIES,
   DEFAULT_TRAITS,
-  VOTE_WINDOW_MS,
 } from "@grille/shared";
 import { CHAR_FIXTURES, toPublicPlayer } from "./fixtures.js";
+
+const MOCK_TOTAL_VOTE_MS = 20_000;
 
 export type MobileScreen =
   | "JOIN"
@@ -48,7 +49,7 @@ export function useMockMobileState() {
   const [name, setName] = useState("");
   const [vote, setVote] = useState<string | null>(null);
   const [locked, setLocked] = useState(false);
-  const [deadline] = useState(() => Date.now() + VOTE_WINDOW_MS);
+  const [deadline] = useState(() => Date.now() + MOCK_TOTAL_VOTE_MS);
 
   const draftTraits: DancerTraits = useMemo(
     () => ({ skin, hairColor: DEFAULT_TRAITS.hairColor, hair, outfit, pants: DEFAULT_TRAITS.pants, acc }),

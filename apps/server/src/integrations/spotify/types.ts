@@ -3,6 +3,7 @@ export interface StubTrack {
   title: string;
   artist: string;
   coverUrl: string;
+  durationMs: number;
 }
 
 /**

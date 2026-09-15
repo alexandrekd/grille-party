@@ -86,5 +86,9 @@ The WS integration test (`apps/server/src/ws/server.integration.test.ts`) specif
 - **No host auth.** The last connection to claim a room code becomes its TV — fine for a trusted living-room game, not for anything public-facing.
 - **QR joining is visual-only** for now; the 4-digit code is the real join path.
 - **Character editor** exposes 4 trait rows (coiffure/peau/tenue/accessoire) — hair color and pants use fixed defaults, matching the original design.
-- Timing constants (vote window, reveal/leaderboard display duration, default round count) live in `packages/shared/src/domain/config.ts` and are reasonable defaults, not specified anywhere upstream.
+- **Game control lives on the leader's phone**, not the TV. The first player to join a room becomes its leader (`PublicPlayerSummary.isLeader`) and gets a settings screen (round count) plus "Lancer la partie" / "Passer" — fixed once assigned, no reassignment if they disconnect. The TV's only clickable control is "Connecter Spotify (Premium)", since that pairing has to happen on the TV's own browser.
+- **Voting window = the round's track length**, not a fixed timer — floored at a 15s minimum (`MIN_VOTE_WINDOW_MS`) in case a track's real duration is unusually short; fixture/stub tracks (no real Spotify duration) get a flat 20s (`FALLBACK_TRACK_DURATION_MS`). Both live in `packages/shared/src/domain/config.ts`.
+- **Scoring rewards speed**: a correct guess scores by how fast it was cast relative to other correct guessers that round (10/8/6/4/2, floored at 2 — see `computeRoundScoring`), not a flat amount. The owner's bluff bonus/malus rules are unchanged.
+- A vote is final once cast — no changing your mind after sending.
+- Timing constants (reveal/leaderboard display duration, default round count) live in `packages/shared/src/domain/config.ts` and are reasonable defaults, not specified anywhere upstream.
 - The mobile "résultat du round" and "classement" screens are original designs (not covered by the source mockups) built to match the app's established visual language.

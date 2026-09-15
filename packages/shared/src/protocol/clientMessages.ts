@@ -27,6 +27,18 @@ export interface HostAdvanceMessage {
   type: "host_advance";
 }
 
+/** Sent by the room's leader (first player to join, see PublicPlayerSummary.isLeader)
+ * over their own player connection — the TV has no clickable controls, so game
+ * control lives on the leader's phone instead of (or in addition to) the host's. */
+export interface PlayerStartGameMessage {
+  type: "player_start_game";
+  maxRounds?: number;
+}
+
+export interface PlayerAdvanceMessage {
+  type: "player_advance";
+}
+
 export interface SubmitVoteMessage {
   type: "submit_vote";
   roundId: string;
@@ -42,6 +54,8 @@ export type PlayerClientMessage =
   | JoinRoomMessage
   | SubmitTraitsMessage
   | SubmitVoteMessage
+  | PlayerStartGameMessage
+  | PlayerAdvanceMessage
   | LeaveRoomMessage;
 
 /** Sent only over a host connection. */

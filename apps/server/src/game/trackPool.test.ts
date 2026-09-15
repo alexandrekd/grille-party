@@ -3,7 +3,7 @@ import { TrackPool } from "./trackPool.js";
 import type { StubTrack } from "../integrations/spotify/index.js";
 
 function track(id: string): StubTrack {
-  return { id, title: id, artist: "Artist", coverUrl: "#000" };
+  return { id, title: id, artist: "Artist", coverUrl: "#000", durationMs: 20_000 };
 }
 
 describe("TrackPool", () => {

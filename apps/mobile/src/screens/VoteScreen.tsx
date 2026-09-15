@@ -1,5 +1,4 @@
 import { Dancer } from "@grille/characters";
-import { VOTE_WINDOW_MS } from "@grille/shared";
 import { PhoneFrame } from "../components/PhoneFrame.js";
 import { Button } from "../components/Button.js";
 import { CountdownRing } from "../components/CountdownRing.js";
@@ -11,6 +10,7 @@ export function VoteScreen({
   onSend,
   locked,
   votingDeadlineTs,
+  totalVoteMs,
   votesReceived,
   votesExpected,
   roundIndex,
@@ -20,6 +20,7 @@ export function VoteScreen({
   onSend: () => void;
   locked: boolean;
   votingDeadlineTs: number;
+  totalVoteMs: number;
   votesReceived: number;
   votesExpected: number;
   roundIndex: number;
@@ -37,7 +38,7 @@ export function VoteScreen({
             {locked ? `Tu dis ${selected?.name ?? "?"}.` : "C'est le titre de qui ?"}
           </div>
         </div>
-        <CountdownRing deadlineTs={votingDeadlineTs} totalMs={VOTE_WINDOW_MS} size={58} innerSize={44} secondsFontSize={20} />
+        <CountdownRing deadlineTs={votingDeadlineTs} totalMs={totalVoteMs} size={58} innerSize={44} secondsFontSize={20} />
       </div>
 
       <div style={{ position: "absolute", left: 22, right: 22, top: 152, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
