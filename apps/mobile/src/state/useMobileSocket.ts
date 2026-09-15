@@ -112,6 +112,9 @@ export function useMobileSocket(): MobileView & { actions: MobileActions } {
           if (msg.code === "room_not_found") setJoinError(msg.message);
           else console.error("[mobile] server error:", msg.code, msg.message);
           break;
+        case "heartbeat":
+          socket.send(encodeMessage({ type: "heartbeat_ack" }));
+          break;
         default:
           break;
       }

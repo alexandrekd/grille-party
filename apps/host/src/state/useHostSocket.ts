@@ -80,6 +80,9 @@ export function useHostSocket(): HostView & { actions: HostActions } {
               socket.send(encodeMessage({ type: "host_join" }));
             }
             break;
+          case "heartbeat":
+            socket.send(encodeMessage({ type: "heartbeat_ack" }));
+            break;
           default:
             break;
         }

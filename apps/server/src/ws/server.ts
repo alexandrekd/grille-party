@@ -4,6 +4,7 @@ import {
   REVEAL_DISPLAY_MS,
   LEADERBOARD_DISPLAY_MS,
   decodeMessage,
+  encodeMessage,
   type ClientMessage,
   type ErrorMessage,
 } from "@grille/shared";
@@ -34,13 +35,16 @@ function playCurrentRound(registry: ConnectionRegistry, room: Room): void {
 
 const SCHEDULER_TICK_MS = 500;
 // Many free-tier hosts/proxies (Render included) silently drop a WebSocket that's
-// gone quiet for a minute or two, without either side ever seeing a close event —
-// the connection just stops delivering frames. Rounds can now run for minutes with
-// no traffic on their own (a song's length, not a fixed 20s), so this isn't rare.
-// A ping every 25s keeps bytes flowing (resets the proxy's idle timer) and lets us
-// detect and terminate a truly-dead connection quickly instead of leaving a player
-// stuck on a stale screen indefinitely.
-const HEARTBEAT_INTERVAL_MS = 25_000;
+// gone quiet for a while, without either side ever seeing a close event — the
+// connection just stops delivering frames. Rounds can now run for minutes with no
+// traffic on their own (a song's length, not a fixed 20s), so this isn't rare.
+// A heartbeat every 10s keeps bytes flowing (resets the proxy's idle timer) and
+// lets us detect and terminate a truly-dead connection quickly instead of leaving
+// a player stuck on a stale screen. Sent two ways: a raw WS ping/pong (cheap, but
+// some proxies handle control frames unreliably) and an application-level
+// heartbeat/heartbeat_ack data message (a normal frame no proxy special-cases) —
+// either counts as "alive".
+const HEARTBEAT_INTERVAL_MS = 10_000;
 
 export function startWsServer(httpServer: HttpServer, roomManager: RoomManager): WebSocketServer {
   const wss = new WebSocketServer({ server: httpServer });
@@ -59,6 +63,10 @@ export function startWsServer(httpServer: HttpServer, roomManager: RoomManager):
     raw.on("message", (data) => {
       const parsed = decodeMessage<ClientMessage>(String(data));
       if (!parsed) return;
+      if (parsed.type === "heartbeat_ack") {
+        alive.add(raw);
+        return;
+      }
       handleMessage(registry, roomManager, connectionId, raw, parsed);
     });
 
@@ -67,6 +75,7 @@ export function startWsServer(httpServer: HttpServer, roomManager: RoomManager):
     });
   });
 
+  const heartbeatFrame = encodeMessage({ type: "heartbeat" });
   const heartbeatTimer = setInterval(() => {
     for (const client of wss.clients) {
       if (!alive.has(client)) {
@@ -75,6 +84,7 @@ export function startWsServer(httpServer: HttpServer, roomManager: RoomManager):
       }
       alive.delete(client);
       client.ping();
+      if (client.readyState === client.OPEN) client.send(heartbeatFrame);
     }
   }, HEARTBEAT_INTERVAL_MS);
 

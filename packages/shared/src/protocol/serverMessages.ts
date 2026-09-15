@@ -120,6 +120,15 @@ export interface ErrorMessage {
   message: string;
 }
 
+/** Application-level heartbeat, on top of the transport's own WS ping/pong — some
+ * proxies pass control frames through unreliably but never mangle a normal data
+ * frame, so this is the more bullet-proof way to keep a connection from going
+ * silently stale during a long, otherwise-quiet VOTING round. Client replies with
+ * `heartbeat_ack` immediately on receipt. */
+export interface HeartbeatMessage {
+  type: "heartbeat";
+}
+
 /** Host-only: start real Spotify playback for the round now beginning. The host
  * needs the track URI to hand to the Web Playback SDK even though it must never be
  * displayed — this is the one place a track identity reaches the host pre-reveal,
@@ -144,7 +153,8 @@ export type SharedServerMessage =
   | GameOverMessage
   | PlayerReconnectedMessage
   | PlayerDisconnectedMessage
-  | ErrorMessage;
+  | ErrorMessage
+  | HeartbeatMessage;
 
 export type HostBoundMessage =
   | SharedServerMessage

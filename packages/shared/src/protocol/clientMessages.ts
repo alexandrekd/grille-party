@@ -56,6 +56,11 @@ export interface LeaveRoomMessage {
   type: "leave_room";
 }
 
+/** Reply to the server's `heartbeat` — see that message's doc comment. */
+export interface HeartbeatAckMessage {
+  type: "heartbeat_ack";
+}
+
 /** Sent only over a player connection. */
 export type PlayerClientMessage =
   | JoinRoomMessage
@@ -64,13 +69,15 @@ export type PlayerClientMessage =
   | PlayerStartGameMessage
   | PlayerAdvanceMessage
   | PlayerResetGameMessage
-  | LeaveRoomMessage;
+  | LeaveRoomMessage
+  | HeartbeatAckMessage;
 
 /** Sent only over a host connection. */
 export type HostClientMessage =
   | HostJoinMessage
   | HostStartGameMessage
   | HostAdvanceMessage
-  | LeaveRoomMessage;
+  | LeaveRoomMessage
+  | HeartbeatAckMessage;
 
 export type ClientMessage = PlayerClientMessage | HostClientMessage;
