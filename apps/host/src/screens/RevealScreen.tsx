@@ -8,12 +8,14 @@ import { confettiParticles } from "../lib/confetti.js";
 export function RevealScreen({
   players,
   ownerPlayerId,
+  track,
   votes,
   scoreDeltas,
   reactions,
 }: {
   players: PublicPlayerSummary[];
   ownerPlayerId: string;
+  track: { title: string; artist: string; coverUrl: string };
   votes: ResolvedVote[];
   scoreDeltas: ScoreDelta[];
   reactions: ReactionAssignment[];
@@ -75,6 +77,31 @@ export function RevealScreen({
         <div style={{ font: "700 28px 'Fredoka',sans-serif", color: "#FFC7D3", marginTop: 14 }}>
           Grillé·e par {correctCount} joueur{correctCount > 1 ? "s" : ""} sur {nonOwnerVoters.length}
         </div>
+        {track.title && (
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 12,
+              marginTop: 20,
+              background: "rgba(36,26,46,.82)",
+              borderRadius: 999,
+              padding: "10px 22px 10px 10px",
+            }}
+          >
+            {track.coverUrl && (
+              <img
+                src={track.coverUrl}
+                alt=""
+                style={{ width: 44, height: 44, borderRadius: 10, objectFit: "cover" }}
+              />
+            )}
+            <div style={{ textAlign: "left" }}>
+              <div style={{ font: "700 19px 'Fredoka',sans-serif", color: "#FFF3E8" }}>{track.title}</div>
+              <div style={{ font: "600 14px 'Nunito',sans-serif", color: "#C9B6D2" }}>{track.artist}</div>
+            </div>
+          </div>
+        )}
       </div>
 
       <div style={{ position: "absolute", left: 66, bottom: 150, display: "flex", alignItems: "flex-end", gap: 34 }}>

@@ -89,7 +89,10 @@ export interface LeaderboardMessage {
   type: "leaderboard";
   standings: StandingEntry[];
   isFinal: boolean;
-  nextRoundInSec?: number;
+  /** Absolute deadline (epoch ms) for the next round's auto-start — an absolute
+   * timestamp rather than a fixed "seconds remaining" so clients can tick it down
+   * themselves instead of freezing at whatever value was true at broadcast time. */
+  nextRoundAtTs?: number;
 }
 
 export interface GameOverMessage {

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Dancer } from "@grille/characters";
 import type { PublicPlayerSummary, StandingEntry } from "@grille/shared";
 import { Dancefloor, FloorGrid, GlowSpot, Particles } from "../components/Dancefloor.js";
@@ -12,16 +12,23 @@ export function LeaderboardScreen({
   roundIndex,
   maxRounds,
   isFinal,
-  nextRoundInSec,
+  nextRoundAtTs,
 }: {
   standings: StandingEntry[];
   players: PublicPlayerSummary[];
   roundIndex: number;
   maxRounds: number;
   isFinal: boolean;
-  nextRoundInSec?: number;
+  nextRoundAtTs?: number;
 }) {
   const confetti = useMemo(() => confettiParticles(10, 777, { round: true }), []);
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!nextRoundAtTs) return;
+    const id = setInterval(() => setNow(Date.now()), 250);
+    return () => clearInterval(id);
+  }, [nextRoundAtTs]);
+  const nextRoundInSec = nextRoundAtTs ? Math.max(0, Math.ceil((nextRoundAtTs - now) / 1000)) : undefined;
   const byId = useMemo(() => new Map(players.map((p) => [p.id, p])), [players]);
 
   const [first, second, third, ...rest] = standings;

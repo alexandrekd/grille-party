@@ -167,7 +167,6 @@ export function App() {
               actions.submitVote(roomState.round.roundId, draftVote);
               setVoteLocked(true);
             }}
-            onChangeMind={() => setVoteLocked(false)}
             locked={voteLocked}
             votingDeadlineTs={roomState.round.votingDeadlineTs}
             votesReceived={voteProgress?.votesReceived ?? 0}
@@ -183,7 +182,7 @@ export function App() {
             standings={leaderboard.standings}
             myPlayerId={myPlayerId}
             isFinal={false}
-            nextRoundInSec={leaderboard.nextRoundInSec}
+            nextRoundAtTs={leaderboard.nextRoundAtTs}
           />
         ) : null;
       case "GAME_OVER":

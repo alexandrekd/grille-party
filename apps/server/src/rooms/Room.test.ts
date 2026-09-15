@@ -97,15 +97,15 @@ describe("Room round loop — happy path", () => {
     expect(round.resolved).toBe(false);
   });
 
-  it("upserts a voter's choice instead of double-counting a changed vote", () => {
+  it("rejects a second vote from the same voter — a vote is final once cast", () => {
     const { room, players } = readyRoom(2);
     room.startGame(8, 0);
     const round = room.currentRound!;
     const [a, b] = players;
-    room.submitVote(a!.id, round.id, round.ownerPlayerId, 100);
-    room.submitVote(a!.id, round.id, b!.id, 150); // changes mind
+    expect(room.submitVote(a!.id, round.id, round.ownerPlayerId, 100)).toBe(true);
+    expect(room.submitVote(a!.id, round.id, b!.id, 150)).toBe(false); // tries to change mind
     expect(round.votes.size).toBe(1);
-    expect(round.votes.get(a!.id)).toBe(b!.id);
+    expect(round.votes.get(a!.id)).toBe(round.ownerPlayerId);
   });
 
   it("rejects a vote for the wrong round id or outside VOTING", () => {

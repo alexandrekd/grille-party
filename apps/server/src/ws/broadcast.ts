@@ -81,7 +81,7 @@ export function leaderboardMessage(room: Room, isFinal: boolean): LeaderboardMes
     type: "leaderboard",
     standings: room.standings,
     isFinal,
-    nextRoundInSec: isFinal ? undefined : Math.round(LEADERBOARD_DISPLAY_MS / 1000),
+    nextRoundAtTs: isFinal ? undefined : room.phaseEnteredAt + LEADERBOARD_DISPLAY_MS,
   };
 }
 

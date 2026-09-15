@@ -9,7 +9,6 @@ export function VoteScreen({
   cards,
   onToggle,
   onSend,
-  onChangeMind,
   locked,
   votingDeadlineTs,
   votesReceived,
@@ -19,7 +18,6 @@ export function VoteScreen({
   cards: VoteCard[];
   onToggle: (id: string) => void;
   onSend: () => void;
-  onChangeMind: () => void;
   locked: boolean;
   votingDeadlineTs: number;
   votesReceived: number;
@@ -86,11 +84,8 @@ export function VoteScreen({
 
       <div style={{ position: "absolute", left: 22, right: 22, bottom: 34 }}>
         {locked ? (
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <Button label="Changer d'avis" onClick={onChangeMind} bg="#1D1626" color="#FF6B5A" border="2px solid #FF6B5A" height={68} fontSize={23} />
-            <div style={{ textAlign: "center", font: "600 17px 'Nunito',sans-serif", color: "#8E7F92" }}>
-              {votesReceived} votes sur {votesExpected} · réponse sur la télé
-            </div>
+          <div style={{ textAlign: "center", font: "600 17px 'Nunito',sans-serif", color: "#8E7F92" }}>
+            {votesReceived} votes sur {votesExpected} · réponse sur la télé
           </div>
         ) : (
           <Button

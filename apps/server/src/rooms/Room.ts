@@ -203,6 +203,8 @@ export class Room {
     const round = this.currentRound;
     if (!round || round.id !== roundId || this.phase !== "VOTING" || round.resolved) return false;
     if (!this.players.has(voterId) || !this.players.has(votedForPlayerId)) return false;
+    // A vote is final once cast — no "changer d'avis" resubmission.
+    if (round.votes.has(voterId)) return false;
     round.votes.set(voterId, votedForPlayerId);
     if (round.votes.size >= this.players.size) this.resolveRound(now);
     return true;

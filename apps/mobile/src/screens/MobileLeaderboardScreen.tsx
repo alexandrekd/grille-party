@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { PhoneFrame } from "../components/PhoneFrame.js";
 
 export interface StandingRow {
@@ -14,13 +15,21 @@ export function MobileLeaderboardScreen({
   standings,
   myPlayerId,
   isFinal,
-  nextRoundInSec,
+  nextRoundAtTs,
 }: {
   standings: StandingRow[];
   myPlayerId: string;
   isFinal: boolean;
-  nextRoundInSec?: number;
+  nextRoundAtTs?: number;
 }) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!nextRoundAtTs) return;
+    const id = setInterval(() => setNow(Date.now()), 250);
+    return () => clearInterval(id);
+  }, [nextRoundAtTs]);
+  const nextRoundInSec = nextRoundAtTs ? Math.max(0, Math.ceil((nextRoundAtTs - now) / 1000)) : undefined;
+
   return (
     <PhoneFrame bg="radial-gradient(100% 60% at 50% 0%,#3B2749 0%,#1A1322 58%,#120E18 100%)">
       <div style={{ position: "absolute", left: 26, right: 26, top: 70, textAlign: "center" }}>

@@ -159,7 +159,7 @@ export function useMockHostState(): HostView & {
       type: "leaderboard",
       standings,
       isFinal,
-      nextRoundInSec: isFinal ? undefined : 5,
+      nextRoundAtTs: isFinal ? undefined : Date.now() + 5000,
     };
     return { roomState, voteProgress: null, roundResolved: null, leaderboard, spotifyCommand: null };
   }, [scene, deadline]);

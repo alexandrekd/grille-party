@@ -62,6 +62,7 @@ export function App() {
           <RevealScreen
             players={roomState.players}
             ownerPlayerId={roundResolved.ownerPlayerId}
+            track={roundResolved.track}
             votes={roundResolved.votes}
             scoreDeltas={roundResolved.scoreDeltas}
             reactions={roundResolved.reactions}
@@ -76,7 +77,7 @@ export function App() {
             roundIndex={roomState.roundIndex}
             maxRounds={roomState.maxRounds}
             isFinal={leaderboard.isFinal}
-            nextRoundInSec={leaderboard.nextRoundInSec}
+            nextRoundAtTs={leaderboard.nextRoundAtTs}
           />
         ) : null;
       default:
