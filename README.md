@@ -30,9 +30,17 @@ This starts all three services together:
 
 Open the host URL in a browser tab (or cast it to a TV) — it displays a room code. Open the mobile URL on your phone(s) to join.
 
-### Playing on real phones (same Wi-Fi)
+### Playing a real party (recommended for regular use)
 
-The mobile dev server binds to all interfaces (`0.0.0.0`) so phones on the same network can reach it, but both apps need to know the server's LAN address — `localhost` only works for you, not for a phone. Set `VITE_WS_URL` to the dev machine's LAN IP before starting:
+```
+npm run party
+```
+
+Detects the laptop's LAN IP automatically and starts the same three services with `VITE_WS_URL` already pointed at it — prints the exact URLs to open on the TV and on phones. No hosting provider, no account, nothing to deploy: plug the laptop into the TV, run this, and everyone on the same Wi-Fi can join. This sidesteps every reliability issue a free-tier host like Render introduces (see "Deploying" below) — there's no server to spin down and no proxy for a WebSocket to go stale through.
+
+**Spotify caveat**: the host's own "Connecter Spotify (Premium)" still works fine this way (it authorizes from the laptop's own browser, which Spotify's OAuth allows over `127.0.0.1`), but each **player's** Spotify connection can't — Spotify won't accept a plain-HTTP LAN address as a redirect URI for a phone's browser. Players should just tap "Passer" on that screen; the game falls back to its fixture track pool for them, which is what powers the round-to-round voting either way — nothing else about the game is affected.
+
+If `npm run party` picks the wrong network (multiple Wi-Fi/VPN adapters, for instance), fall back to the manual method — find the laptop's LAN IP yourself and pass it explicitly:
 
 ```
 VITE_WS_URL=ws://192.168.1.42:8787 npm run dev
@@ -40,7 +48,7 @@ VITE_WS_URL=ws://192.168.1.42:8787 npm run dev
 
 (or create `apps/host/.env.local` / `apps/mobile/.env.local` with `VITE_WS_URL=ws://192.168.1.42:8787`). Then open `http://192.168.1.42:5174` on each phone.
 
-## Deploying (no local setup needed)
+## Deploying (optional — for playing without a laptop present)
 
 `render.yaml` at the repo root is a [Render Blueprint](https://render.com/docs/blueprint-spec) that deploys all three services straight from this GitHub repo — no CLI, and it redeploys automatically on every push to `main`:
 

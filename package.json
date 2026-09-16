@@ -8,6 +8,7 @@
   ],
   "scripts": {
     "dev": "concurrently -n server,host,mobile -c blue,green,magenta \"npm run dev -w apps/server\" \"npm run dev -w apps/host\" \"npm run dev -w apps/mobile\"",
+    "party": "node scripts/party.mjs",
     "dev:server": "npm run dev -w apps/server",
     "dev:host": "npm run dev -w apps/host",
     "dev:mobile": "npm run dev -w apps/mobile",
