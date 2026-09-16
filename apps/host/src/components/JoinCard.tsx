@@ -37,7 +37,7 @@ export function JoinCard({ code }: { code: string }) {
         position: "absolute",
         left: 64,
         top: 74,
-        width: 404,
+        width: 470,
         background: "#FFF3E8",
         borderRadius: 32,
         padding: 38,
@@ -55,6 +55,7 @@ export function JoinCard({ code }: { code: string }) {
           style={{
             width: 150,
             height: 150,
+            flexShrink: 0,
             borderRadius: 20,
             background: qrDataUrl ? "#FFF3E8" : "repeating-linear-gradient(45deg,#E4D6C9 0 6px,#F4E8DC 6px 12px)",
             display: "flex",
