@@ -88,7 +88,7 @@ export function RoundScreen({
           <Dancer key={p.id} traits={p.traits!} reaction="dance" dance={danceFor(i)} delay={delayFor(i)} scale={0.66} showName={false} />
         ))}
       </div>
-      <div style={{ position: "absolute", left: 0, right: 0, bottom: 104, display: "flex", justifyContent: "center", alignItems: "flex-end", gap: 36 }}>
+      <div style={{ position: "absolute", left: 0, right: 0, bottom: 160, display: "flex", justifyContent: "center", alignItems: "flex-end", gap: 36 }}>
         {front.map((p, i) => (
           <Dancer key={p.id} traits={p.traits!} label={p.name} reaction="dance" dance={danceFor(i + 4)} delay={delayFor(i + 4)} scale={0.98} showName />
         ))}
