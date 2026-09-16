@@ -7,7 +7,7 @@ import type { CSSProperties, ReactNode } from "react";
  * status bar) or a real browser window. */
 export function PhoneFrame({ bg, children }: { bg: string; children: ReactNode }) {
   return (
-    <div style={{ position: "relative", width: 390, height: 844, overflow: "hidden" }}>
+    <div style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden" }}>
       <div style={{ position: "absolute", inset: 0, background: bg }} />
       {children}
     </div>
