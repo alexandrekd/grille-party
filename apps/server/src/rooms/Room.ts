@@ -4,6 +4,7 @@ import {
   MIN_VOTE_WINDOW_MS,
   validateTraits,
   type DancerTraits,
+  type MusicSource,
   type PlayerStatus,
   type PublicPlayerSummary,
   type ReactionAssignment,
@@ -83,6 +84,9 @@ export class Room {
    * route the SDK polls. `null` means the host hasn't connected Spotify (or skipped
    * it) — the game still runs, just silently, matching the pre-integration MVP. */
   hostSpotifyTokens: { accessToken: string; refreshToken: string; expiresAt: number } | null = null;
+  /** Leader-set (player_set_music_source) — see MusicSource's doc comment for why
+   * this only affects a player's track pool as of when *they* connect Spotify. */
+  musicSource: MusicSource = "recent";
   maxRounds = DEFAULT_MAX_ROUNDS;
   readonly players = new Map<string, PlayerRecord>();
   readonly rounds: RoundRecord[] = [];
@@ -161,6 +165,10 @@ export class Room {
     this.leaderPlayerId = next.id;
     this.leaderDisconnectedAt = null;
     return true;
+  }
+
+  setMusicSource(source: MusicSource): void {
+    this.musicSource = source;
   }
 
   setHostConnection(connectionId: string): void {

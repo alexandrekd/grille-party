@@ -4,6 +4,9 @@ export interface StubTrack {
   artist: string;
   coverUrl: string;
   durationMs: number;
+  /** Position in whatever pool this came from (1 = top) — undefined for a
+   * fixture/stub track, where a "rank" wouldn't mean anything real. */
+  rank?: number;
 }
 
 /**

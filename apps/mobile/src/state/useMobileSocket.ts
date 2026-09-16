@@ -4,6 +4,7 @@ import {
   encodeMessage,
   type DancerTraits,
   type LeaderboardMessage,
+  type MusicSource,
   type PlayerBoundMessage,
   type RoomStateMessage,
   type RoundResolvedMessage,
@@ -43,6 +44,7 @@ export interface MobileActions {
   startGame: (maxRounds?: number) => void;
   advance: () => void;
   resetGame: () => void;
+  setMusicSource: (source: MusicSource) => void;
 }
 
 /**
@@ -239,6 +241,10 @@ export function useMobileSocket(): MobileView & { actions: MobileActions } {
     wsRef.current?.send(encodeMessage({ type: "player_reset_game" }));
   }, []);
 
+  const setMusicSource = useCallback((source: MusicSource) => {
+    wsRef.current?.send(encodeMessage({ type: "player_set_music_source", musicSource: source }));
+  }, []);
+
   return {
     roomState,
     voteProgress,
@@ -247,6 +253,6 @@ export function useMobileSocket(): MobileView & { actions: MobileActions } {
     myPlayerId,
     myVote,
     joinError,
-    actions: { join, submitTraits, submitVote, startGame, advance, resetGame },
+    actions: { join, submitTraits, submitVote, startGame, advance, resetGame, setMusicSource },
   };
 }

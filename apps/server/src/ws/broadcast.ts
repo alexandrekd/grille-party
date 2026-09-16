@@ -40,6 +40,7 @@ export function roomStateMessage(room: Room): RoomStateMessage {
     maxRounds: room.maxRounds,
     roundIndex: room.currentRoundIndex,
     allReady: room.allReady,
+    musicSource: room.musicSource,
   };
 }
 
@@ -63,7 +64,12 @@ export function roundResolvedMessage(room: Room): RoundResolvedMessage | null {
     type: "round_resolved",
     roundId: round.id,
     ownerPlayerId: round.ownerPlayerId,
-    track: { title: round.track.title, artist: round.track.artist, coverUrl: round.track.coverUrl },
+    track: {
+      title: round.track.title,
+      artist: round.track.artist,
+      coverUrl: round.track.coverUrl,
+      rank: round.track.rank,
+    },
     votes: room.resolvedVotesFor(round),
     scoreDeltas: round.scoreDeltas,
     newScores: [...room.players.values()].map((p) => ({ playerId: p.id, score: p.score })),

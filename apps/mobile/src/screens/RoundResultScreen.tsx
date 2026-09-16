@@ -9,6 +9,9 @@ export interface MyOutcome {
   pointsDelta: number;
   myTraits: DancerTraits;
   myName: string;
+  /** e.g. "Top 3 du mois de Léa" — null when the track's rank isn't known (a
+   * fixture/stub track, not a real Spotify fetch). */
+  rankLabel: string | null;
 }
 
 /**
@@ -19,7 +22,7 @@ export interface MyOutcome {
  * (auto-advances to the leaderboard) — no manual continue button.
  */
 export function RoundResultScreen({ outcome }: { outcome: MyOutcome }) {
-  const { ownerName, wasOwner, guessedCorrectly, pointsDelta, myTraits, myName } = outcome;
+  const { ownerName, wasOwner, guessedCorrectly, pointsDelta, myTraits, myName, rankLabel } = outcome;
 
   const reaction: Reaction = wasOwner ? "caught" : guessedCorrectly ? "win" : "sad";
   const bannerText = wasOwner
@@ -39,6 +42,21 @@ export function RoundResultScreen({ outcome }: { outcome: MyOutcome }) {
           C'était {ownerName} !
         </div>
         <div style={{ font: "700 22px 'Fredoka',sans-serif", color: bannerColor, marginTop: 14 }}>{bannerText}</div>
+        {rankLabel && (
+          <div
+            style={{
+              display: "inline-block",
+              marginTop: 14,
+              font: "700 13px 'Nunito',sans-serif",
+              color: "#C9B6D2",
+              background: "rgba(36,26,46,.8)",
+              borderRadius: 999,
+              padding: "7px 16px",
+            }}
+          >
+            🎧 {rankLabel}
+          </div>
+        )}
       </div>
 
       <div style={{ position: "absolute", left: 0, right: 0, top: 300, display: "flex", justifyContent: "center" }}>

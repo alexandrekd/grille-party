@@ -61,6 +61,7 @@ export function useMockHostState(): HostView & {
       roomCode: ROOM_CODE,
       maxRounds: DEFAULT_MAX_ROUNDS,
       roundIndex: ROUND_INDEX,
+      musicSource: "recent" as const,
     };
 
     if (scene === "LOBBY") {

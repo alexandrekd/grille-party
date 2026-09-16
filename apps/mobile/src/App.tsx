@@ -11,6 +11,7 @@ import {
 } from "@grille/shared";
 import { Stage } from "./components/Stage.js";
 import { serverHttpBase } from "./lib/serverHttpBase.js";
+import { rankLabel } from "./lib/musicSourceLabel.js";
 import { useMobileSocket } from "./state/useMobileSocket.js";
 import type { VoteCard } from "./state/useMockMobileState.js";
 import { JoinScreen } from "./screens/JoinScreen.js";
@@ -111,6 +112,10 @@ export function App() {
       pointsDelta,
       myTraits: me?.traits ?? draftTraits,
       myName: me?.name ?? (name || "Toi"),
+      rankLabel:
+        roundResolved.track.rank != null
+          ? rankLabel(roomState.musicSource, roundResolved.track.rank, owner?.name ?? "?")
+          : null,
     };
   }, [roundResolved, myPlayerId, roomState, me, draftTraits, name]);
 
@@ -171,6 +176,8 @@ export function App() {
             traits={me.traits!}
             lobbyChars={roomState.players.filter((p) => p.id !== myPlayerId)}
             allReady={roomState.allReady}
+            musicSource={roomState.musicSource}
+            onSetMusicSource={actions.setMusicSource}
             onStart={(maxRounds) => actions.startGame(maxRounds)}
           />
         ) : (

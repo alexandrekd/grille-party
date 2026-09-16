@@ -35,10 +35,10 @@ export class StubSpotifyProvider implements SpotifyProvider {
     // Pool exhausted (more players than the fixture pool supports) — wrap around
     // rather than leaving a player with zero tracks; still no in-game repeats
     // because the room dedupes by track id when building its round pool.
-    const filled =
-      chunk.length > 0
-        ? chunk
-        : shuffle(FIXTURE_TRACKS).slice(0, FIXTURE_PARTITION_SIZE);
+    const picked = chunk.length > 0 ? chunk : shuffle(FIXTURE_TRACKS).slice(0, FIXTURE_PARTITION_SIZE);
+    // Fictional but consistent with the real-Spotify path — lets the reveal's
+    // "Top N" stat work the same way regardless of where the track came from.
+    const filled = picked.map((t, i) => ({ ...t, rank: i + 1 }));
     this.assigned.set(playerId, filled);
     return filled;
   }

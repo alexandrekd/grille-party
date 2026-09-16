@@ -245,6 +245,18 @@ function handleMessage(
       return;
     }
 
+    case "player_set_music_source": {
+      const room = roomForMeta(roomManager, meta);
+      if (!room || meta.role !== "player") return;
+      if (meta.playerId !== room.leaderPlayerId) {
+        sendError(raw, "not_leader", "Seul le joueur principal peut changer la source musicale.");
+        return;
+      }
+      room.setMusicSource(msg.musicSource);
+      broadcastRoomState(registry, room);
+      return;
+    }
+
     case "submit_vote": {
       const room = roomForMeta(roomManager, meta);
       if (!room || meta.role !== "player" || !meta.playerId) return;

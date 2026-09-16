@@ -1,21 +1,24 @@
 import { useMemo } from "react";
 import { Dancer } from "@grille/characters";
-import type { PublicPlayerSummary, ReactionAssignment, ResolvedVote, ScoreDelta } from "@grille/shared";
+import type { MusicSource, PublicPlayerSummary, ReactionAssignment, ResolvedVote, ScoreDelta } from "@grille/shared";
 import { Dancefloor, FloorGrid, Halo, Particles } from "../components/Dancefloor.js";
 import { PointPill } from "../components/PointPill.js";
 import { confettiParticles } from "../lib/confetti.js";
+import { rankLabel } from "../lib/musicSourceLabel.js";
 
 export function RevealScreen({
   players,
   ownerPlayerId,
   track,
+  musicSource,
   votes,
   scoreDeltas,
   reactions,
 }: {
   players: PublicPlayerSummary[];
   ownerPlayerId: string;
-  track: { title: string; artist: string; coverUrl: string };
+  track: { title: string; artist: string; coverUrl: string; rank?: number };
+  musicSource: MusicSource;
   votes: ResolvedVote[];
   scoreDeltas: ScoreDelta[];
   reactions: ReactionAssignment[];
@@ -103,6 +106,11 @@ export function RevealScreen({
           <div style={{ textAlign: "left" }}>
             <div style={{ font: "700 19px 'Fredoka',sans-serif", color: "#FFF3E8" }}>{track.title}</div>
             <div style={{ font: "600 14px 'Nunito',sans-serif", color: "#C9B6D2" }}>{track.artist}</div>
+            {track.rank != null && owner && (
+              <div style={{ font: "700 12px 'Nunito',sans-serif", color: "#FFB34D", marginTop: 2 }}>
+                {rankLabel(musicSource, track.rank, owner.name)}
+              </div>
+            )}
           </div>
         </div>
       )}

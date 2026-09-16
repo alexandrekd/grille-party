@@ -61,6 +61,13 @@ describe("Room lobby", () => {
     expect(room.publicPlayers.find((p) => p.id === b.id)?.isLeader).toBe(false);
   });
 
+  it("defaults musicSource to recent and lets it be changed", () => {
+    const room = new Room("1234", fakeSpotify());
+    expect(room.musicSource).toBe("recent");
+    room.setMusicSource("alltime");
+    expect(room.musicSource).toBe("alltime");
+  });
+
   it("reassigns the leader to another connected player after the grace period, not before", () => {
     const room = new Room("1234", fakeSpotify());
     const a = room.addPlayer("A");

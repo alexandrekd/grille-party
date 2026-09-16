@@ -3,7 +3,7 @@ import type { RoomManager } from "../rooms/RoomManager.js";
 import {
   buildAuthorizeUrl,
   exchangeCodeForToken,
-  fetchTopTracks,
+  fetchTracksForSource,
   refreshAccessToken,
   type SpotifyConfig,
 } from "../integrations/spotify/oauth.js";
@@ -18,7 +18,10 @@ export interface HttpDeps {
   publicHostUrl: string;
 }
 
-const PLAYER_SCOPE = "user-top-read";
+// playlist-read-private is only actually used by the "onrepeat" music source (to
+// find the player's auto-generated "On Repeat" playlist), but it's requested
+// upfront since Spotify doesn't support incremental/step-up scope grants.
+const PLAYER_SCOPE = "user-top-read playlist-read-private";
 const HOST_SCOPE = "streaming user-read-email user-read-private";
 
 function redirectTo(res: ServerResponse, location: string): void {
@@ -159,7 +162,7 @@ async function handlePlayerCallback(
   try {
     const redirectUri = `${deps.publicServerUrl}/spotify/player/callback`;
     const tokens = await exchangeCodeForToken(spotify, { code, redirectUri });
-    const tracks = await fetchTopTracks(tokens.accessToken);
+    const tracks = await fetchTracksForSource(tokens.accessToken, room.musicSource);
     room.setPlayerTopTracks(pending.playerId, tracks);
     redirectTo(res, `${deps.publicMobileUrl}/?spotify=ok`);
   } catch (e) {

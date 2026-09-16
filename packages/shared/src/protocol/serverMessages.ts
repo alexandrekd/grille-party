@@ -1,4 +1,5 @@
 import type {
+  MusicSource,
   PublicPlayerSummary,
   ResolvedVote,
   RoomPhase,
@@ -49,6 +50,9 @@ export interface RoomStateMessage {
   maxRounds: number;
   roundIndex: number;
   allReady: boolean;
+  /** Leader-set, applied to a player's track pool as of when *they* connect
+   * Spotify — see MusicSource's doc comment. */
+  musicSource: MusicSource;
 }
 
 /** Aggregate-only vote progress — identical shape/content for host and every player. */
@@ -82,7 +86,11 @@ export interface RoundResolvedMessage {
   type: "round_resolved";
   roundId: string;
   ownerPlayerId: string;
-  track: { title: string; artist: string; coverUrl: string };
+  /** `rank` is the track's position in whatever pool it came from (1 = top) when
+   * that's known from a real Spotify fetch — absent for a fixture/stub track,
+   * since a rank there wouldn't mean anything real. Powers the reveal's "Top N
+   * de {name}" stat. */
+  track: { title: string; artist: string; coverUrl: string; rank?: number };
   votes: ResolvedVote[];
   scoreDeltas: ScoreDelta[];
   newScores: { playerId: string; score: number }[];

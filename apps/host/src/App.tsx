@@ -81,6 +81,7 @@ export function App() {
             players={roomState.players}
             ownerPlayerId={roundResolved.ownerPlayerId}
             track={roundResolved.track}
+            musicSource={roomState.musicSource}
             votes={roundResolved.votes}
             scoreDeltas={roundResolved.scoreDeltas}
             reactions={roundResolved.reactions}

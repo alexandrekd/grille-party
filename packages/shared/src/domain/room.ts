@@ -2,6 +2,16 @@ import type { DancerTraits, Reaction } from "./traits.js";
 
 export type RoomPhase = "LOBBY" | "VOTING" | "REVEAL" | "LEADERBOARD" | "GAME_OVER";
 
+/** What each player's track pool is pulled from — chosen by the leader
+ * (player_set_music_source), applied to a player's own tracks at the moment
+ * *they* connect Spotify (see the player OAuth callback), so changing it mid-lobby
+ * doesn't retroactively affect anyone who already connected.
+ *   - "recent": Spotify's short_term top tracks (~4 weeks)
+ *   - "alltime": Spotify's long_term top tracks (several years)
+ *   - "onrepeat": tracks from the player's "On Repeat" auto-generated playlist,
+ *     if Spotify exposes one for their account — falls back to "recent" if not. */
+export type MusicSource = "recent" | "alltime" | "onrepeat";
+
 export type PlayerStatus = "JOINED" | "READY";
 
 export interface Track {

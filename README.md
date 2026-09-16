@@ -78,6 +78,8 @@ What each side needs:
 
 Track titles/artists are still never shown anywhere in the UI (by design, so nothing spoils who owns a song) — the host only ever receives an opaque track URI to hand to Spotify's playback API, never a human-readable title.
 
+**Music source**: the leader picks where each player's tracks come from, from their settings screen — "Top du mois" (Spotify's `short_term` top tracks, ~4 weeks), "Top de toujours" (`long_term`, several years), or "En boucle" (the player's auto-generated "On Repeat" playlist, if Spotify exposes one for their account — silently falls back to "Top du mois" if not found). Applied to a player's pool as of when *they* connect Spotify, so changing it mid-lobby doesn't retroactively affect anyone who already connected. The reveal screen (host and mobile) shows the track's real rank in that pool — "Top 3 du mois de Léa" — when it came from a genuine Spotify fetch; nothing shows for a fixture/stub track. (Play counts or minutes-listened aren't shown because Spotify's API doesn't expose that data for any account, including its own.)
+
 ## Testing
 
 ```

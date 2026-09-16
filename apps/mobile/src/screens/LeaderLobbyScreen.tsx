@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Dancer } from "@grille/characters";
-import { DEFAULT_MAX_ROUNDS, type DancerTraits, type PublicPlayerSummary } from "@grille/shared";
+import { DEFAULT_MAX_ROUNDS, type DancerTraits, type MusicSource, type PublicPlayerSummary } from "@grille/shared";
 import { PhoneFrame, Particles } from "../components/PhoneFrame.js";
 import { Button } from "../components/Button.js";
 import { mobileConfetti } from "../lib/confetti.js";
@@ -8,14 +8,23 @@ import { mobileConfetti } from "../lib/confetti.js";
 const MIN_ROUNDS = 3;
 const MAX_ROUNDS = 15;
 
+const MUSIC_SOURCE_OPTIONS: { value: MusicSource; label: string }[] = [
+  { value: "recent", label: "Top du mois" },
+  { value: "alltime", label: "Top de toujours" },
+  { value: "onrepeat", label: "En boucle" },
+];
+
 /** Shown instead of WaitingRoomScreen to the room's leader (first player to join —
  * see PublicPlayerSummary.isLeader) — the TV has no clickable controls, so the
- * "lancer la partie" action and its one setting (round count) live here instead. */
+ * "lancer la partie" action and its settings (round count, music source) live
+ * here instead. */
 export function LeaderLobbyScreen({
   name,
   traits,
   lobbyChars,
   allReady,
+  musicSource,
+  onSetMusicSource,
   onStart,
   maxSlots = 8,
 }: {
@@ -23,6 +32,8 @@ export function LeaderLobbyScreen({
   traits: DancerTraits;
   lobbyChars: PublicPlayerSummary[];
   allReady: boolean;
+  musicSource: MusicSource;
+  onSetMusicSource: (source: MusicSource) => void;
   onStart: (maxRounds: number) => void;
   maxSlots?: number;
 }) {
@@ -71,7 +82,35 @@ export function LeaderLobbyScreen({
             />
           </div>
         </div>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 16 }}>
+        <div style={{ marginTop: 18 }}>
+          <div style={{ font: "700 18px 'Fredoka',sans-serif", color: "#FFF3E8", marginBottom: 10 }}>Musique des joueurs</div>
+          <div style={{ display: "flex", gap: 8 }}>
+            {MUSIC_SOURCE_OPTIONS.map((opt) => {
+              const selected = musicSource === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  onClick={() => onSetMusicSource(opt.value)}
+                  style={{
+                    flex: 1,
+                    border: "none",
+                    borderRadius: 14,
+                    padding: "10px 6px",
+                    background: selected ? "#FFB34D" : "#241A2E",
+                    color: selected ? "#452A05" : "#C9B6D2",
+                    font: "700 12px 'Nunito',sans-serif",
+                    cursor: "pointer",
+                    lineHeight: 1.3,
+                  }}
+                >
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 18 }}>
           <div style={{ font: "700 14px 'Nunito',sans-serif", letterSpacing: ".2em", color: "#8E7F92" }}>SUR LA PISTE</div>
           <div style={{ font: "700 18px 'Fredoka',sans-serif", color: "#FFB34D" }}>{lobbyChars.length + 1} / {maxSlots}</div>
         </div>

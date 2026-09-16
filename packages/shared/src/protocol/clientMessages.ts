@@ -1,4 +1,5 @@
 import type { DancerTraits } from "../domain/traits.js";
+import type { MusicSource } from "../domain/room.js";
 
 export interface JoinRoomMessage {
   type: "join_room";
@@ -46,6 +47,13 @@ export interface PlayerResetGameMessage {
   type: "player_reset_game";
 }
 
+/** Leader-only — see MusicSource's doc comment for why this applies only to
+ * players who connect Spotify *after* it's set, not retroactively. */
+export interface PlayerSetMusicSourceMessage {
+  type: "player_set_music_source";
+  musicSource: MusicSource;
+}
+
 export interface SubmitVoteMessage {
   type: "submit_vote";
   roundId: string;
@@ -69,6 +77,7 @@ export type PlayerClientMessage =
   | PlayerStartGameMessage
   | PlayerAdvanceMessage
   | PlayerResetGameMessage
+  | PlayerSetMusicSourceMessage
   | LeaveRoomMessage
   | HeartbeatAckMessage;
 
