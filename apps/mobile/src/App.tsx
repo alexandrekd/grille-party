@@ -241,16 +241,17 @@ function SkipButton({ onClick }: { onClick: () => void }) {
       onClick={onClick}
       style={{
         position: "fixed",
-        right: 16,
-        bottom: 16,
-        font: "700 14px 'Nunito',sans-serif",
-        padding: "10px 18px",
+        right: 10,
+        top: "max(8px, env(safe-area-inset-top))",
+        font: "700 12px 'Nunito',sans-serif",
+        padding: "6px 12px",
         borderRadius: 999,
         border: "none",
         cursor: "pointer",
         background: "#FFB34D",
         color: "#452A05",
-        boxShadow: "0 5px 0 #C9832F",
+        boxShadow: "0 4px 0 #C9832F",
+        zIndex: 10,
       }}
     >
       Passer →
@@ -266,15 +267,16 @@ function ResetButton({ onClick }: { onClick: () => void }) {
       onClick={onClick}
       style={{
         position: "fixed",
-        left: 16,
-        bottom: 16,
-        font: "700 14px 'Nunito',sans-serif",
-        padding: "10px 18px",
+        left: 10,
+        top: "max(8px, env(safe-area-inset-top))",
+        font: "700 12px 'Nunito',sans-serif",
+        padding: "6px 12px",
         borderRadius: 999,
         border: "2px solid #FF6B5A",
         cursor: "pointer",
         background: "rgba(29,20,38,.9)",
         color: "#FF6B5A",
+        zIndex: 10,
       }}
     >
       ↺ Réinitialiser
