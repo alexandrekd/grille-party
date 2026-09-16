@@ -1,3 +1,7 @@
+import { useEffect, useState } from "react";
+import QRCode from "qrcode";
+import { mobileJoinUrl } from "../lib/mobileUrl.js";
+
 const DIGIT_STYLES = [
   { bg: "#FF6B5A", color: "#FFF3E8" },
   { bg: "#FFB34D", color: "#452A05" },
@@ -7,6 +11,26 @@ const DIGIT_STYLES = [
 
 export function JoinCard({ code }: { code: string }) {
   const digits = code.padStart(4, "0").split("");
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    QRCode.toDataURL(mobileJoinUrl(code), {
+      width: 300,
+      margin: 1,
+      color: { dark: "#2A1E2B", light: "#FFF3E8" },
+    })
+      .then((url) => {
+        if (!cancelled) setQrDataUrl(url);
+      })
+      .catch(() => {
+        if (!cancelled) setQrDataUrl(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [code]);
+
   return (
     <div
       style={{
@@ -32,16 +56,21 @@ export function JoinCard({ code }: { code: string }) {
             width: 150,
             height: 150,
             borderRadius: 20,
-            background: "repeating-linear-gradient(45deg,#E4D6C9 0 6px,#F4E8DC 6px 12px)",
+            background: qrDataUrl ? "#FFF3E8" : "repeating-linear-gradient(45deg,#E4D6C9 0 6px,#F4E8DC 6px 12px)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             font: "600 11px 'Nunito',monospace",
             color: "#7A6656",
             textAlign: "center",
+            overflow: "hidden",
           }}
         >
-          QR CODE
+          {qrDataUrl ? (
+            <img src={qrDataUrl} alt="QR code pour rejoindre la partie" width={150} height={150} />
+          ) : (
+            "QR CODE"
+          )}
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <div style={{ font: "700 18px 'Nunito',sans-serif", color: "#7A6656" }}>ou tape le code</div>

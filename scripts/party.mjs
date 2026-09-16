@@ -49,6 +49,6 @@ console.log("");
 const child = spawn("npm", ["run", "dev"], {
   stdio: "inherit",
   shell: true,
-  env: { ...process.env, VITE_WS_URL: `ws://${ip}:8787` },
+  env: { ...process.env, VITE_WS_URL: `ws://${ip}:8787`, VITE_MOBILE_URL: `http://${ip}:5174` },
 });
 child.on("exit", (code) => process.exit(code ?? 0));

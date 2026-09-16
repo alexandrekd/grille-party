@@ -140,16 +140,24 @@ export function useMobileSocket(): MobileView & { actions: MobileActions } {
   }, []);
 
   // On mount, if a rejoin token is already stored (reload mid-game), reconnect
-  // automatically instead of waiting for the join screen.
+  // automatically instead of waiting for the join screen. Cleanup closes only the
+  // socket *this effect run* opened — never the shared wsRef — since a deep-linked
+  // room code (?code=XXXX, e.g. from the host's QR code) makes JoinScreen call
+  // `join()` synchronously on first render too; reading wsRef.current at cleanup
+  // time could then tear down that unrelated, already-in-flight connection instead
+  // (most visible under StrictMode's dev-only double-invoke).
   useEffect(() => {
     const stored = loadStoredRejoin();
+    let socket: WebSocket | null = null;
     if (stored) {
       pendingJoinRef.current = { roomCode: stored.roomCode, rejoinToken: stored.rejoinToken };
-      ensureSocket();
+      socket = ensureSocket();
     }
     return () => {
-      pendingJoinRef.current = null;
-      wsRef.current?.close();
+      if (socket) {
+        pendingJoinRef.current = null;
+        socket.close();
+      }
     };
   }, [ensureSocket]);
 

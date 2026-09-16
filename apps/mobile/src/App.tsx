@@ -31,7 +31,13 @@ export function App() {
   const { roomState, voteProgress, roundResolved, leaderboard, myPlayerId, myVote, joinError, actions } =
     useMobileSocket();
 
-  const [code, setCode] = useState("");
+  // The host's QR code encodes a deep link (?code=XXXX) so scanning it with the
+  // phone's own camera app opens straight to this pre-filled code — JoinScreen's
+  // existing 4-digit auto-join effect takes it from here, same as manual entry.
+  const [code, setCode] = useState(() => {
+    const fromUrl = new URLSearchParams(window.location.search).get("code") ?? "";
+    return /^\d{4}$/.test(fromUrl) ? fromUrl : "";
+  });
   // Connecting Spotify navigates away to accounts.spotify.com and back — every bit
   // of React state is lost on that round trip except what's in localStorage (the
   // rejoin token, which useMobileSocket already restores) and the server's own
@@ -62,10 +68,10 @@ export function App() {
     if (joinError) setCode("");
   }, [joinError]);
 
-  // Clean the ?spotify=ok|error param out of the URL once read, so a manual reload
-  // doesn't re-trigger it.
+  // Clean the ?spotify=ok|error / ?code= params out of the URL once read, so a
+  // manual reload doesn't re-trigger them.
   useEffect(() => {
-    if (window.location.search.includes("spotify=")) {
+    if (window.location.search.includes("spotify=") || window.location.search.includes("code=")) {
       window.history.replaceState(null, "", window.location.pathname);
     }
   }, []);

@@ -31,6 +31,8 @@ services:
     envVars:
       - key: VITE_WS_URL
         value: wss://grille-server.onrender.com
+      - key: VITE_MOBILE_URL
+        value: https://grille-mobile.onrender.com
 
   - type: web
     name: grille-mobile
